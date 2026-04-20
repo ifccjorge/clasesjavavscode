@@ -93,21 +93,47 @@ public class App {
         System.out.println("Salario medio en hombres: " + suma_salarios_hombre / total_empleados_hombre);
         System.out.println("Número medio asignaturas: " + suma_asignaturas / total_estudiantes);
         // Ejemplo switch
+        // https://docs.oracle.com/javase/tutorial/java/nutsandbolts/switch.html
         System.out.println("EJEMPLO con switch");
         DayOfWeek today = DayOfWeek.FRIDAY;
+        // Switch mejorado
         switch (today) {
-            case MONDAY:
-                System.out.println("Vaya! Se hacen eternos los lunes");
-                break;
-            case TUESDAY:
-                System.out.println("Es martes");
-                break;
-            case FRIDAY:
-                System.out.println("Es viernes y el cuerpo lo sabe");
-                break;
-            default:
-                System.out.println("No existe ninguna info para el dia introducido");
-                break;
+            case MONDAY -> System.out.println("Vaya! Se hacen eternos los lunes");
+            case TUESDAY -> System.out.println("Es martes");
+            case FRIDAY -> System.out.println("Es viernes y el cuerpo lo sabe");
+            default -> System.out.println("No existe ninguna info para el dia introducido");
         }
+        // https://docs.oracle.com/javase/tutorial/java/nutsandbolts/branch.html
+
+        int[][] arrayOfInts = { 
+            { 32, 87, 3, 589 },
+            { 12, 1076, 2000, 8 },
+            { 622, 127, 77, 955 }
+        };
+        int searchfor = 8;
+
+        int i = 0;
+        int j = 0;
+        boolean foundIt = false;
+
+        search:
+        for (int[] fila : arrayOfInts) {
+            for (int valor : fila) {
+                if (valor == searchfor) {
+                    foundIt = true;
+                    break search;
+                }
+                j++;
+            }
+            j = 0;
+            i++;
+        }
+
+        if (foundIt) {
+            System.out.println("Found " + searchfor + " at [" + i + "," + j + "]");
+        } else {
+            System.out.println(searchfor + " not in the array");
+        }
+
     }
 }
