@@ -134,6 +134,9 @@ public class App {
         } else {
             System.out.println(searchfor + " not in the array");
         }
-
+        Habitante habitante1 = new Habitante("Luis", 1.80);
+        Habitante habitante2 = Habitante.builder().nombre("Pedro").altura(1.80).build();
+        System.out.println(habitante1.nombre());
+        System.out.println(habitante2.nombre());
     }
 }
