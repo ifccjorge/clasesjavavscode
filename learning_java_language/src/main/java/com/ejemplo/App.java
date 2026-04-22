@@ -5,6 +5,14 @@ import java.time.LocalDate;
 import java.time.Month;
 
 public class App {
+    public static void imprimeDetalle(Object obj) {
+        if (obj instanceof Book book) {
+            System.out.println("El libro " + book.titulo() + " lo escribió " + book.autor());
+        }
+        if (obj instanceof Book(String s1, String s2)) {
+            System.out.println("El libro " + s1 + " lo escribió " + s2);
+        }
+    }
     public static void main(String[] args) {
         // EJERCICIO
         // Empleados
@@ -138,5 +146,8 @@ public class App {
         Habitante habitante2 = Habitante.builder().nombre("Pedro").altura(1.80).build();
         System.out.println(habitante1.nombre());
         System.out.println(habitante2.nombre());
+        //Crear record
+        Book libro1 = Book.builder().titulo("El libro").autor("El autor").build();
+        imprimeDetalle(libro1);
     }
 }
