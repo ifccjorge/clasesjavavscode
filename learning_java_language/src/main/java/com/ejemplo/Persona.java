@@ -2,19 +2,21 @@ package com.ejemplo;
 
 import java.time.LocalDate;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import lombok.Builder;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Data
-@SuperBuilder
-public class Persona {
-	private String nombre;
-	private String primerApellido;
-	private String segundoApellido;
-	private Genero genero;
-	private LocalDate fechaNacimiento;
+@Builder
+public record Persona(
+		String nombre,
+		String primerApellido,
+		String segundoApellido,
+		Genero genero,
+		LocalDate fechaNacimiento,
+		double salario) implements Comparable<Persona>{
+    @Override
+    public int compareTo(Persona persona) {
+		int i1 = this.primerApellido.compareTo(persona.primerApellido);
+		int i2 = this.segundoApellido.compareTo(persona.segundoApellido);
+		int i3 = this.nombre.compareTo(persona.nombre);
+		return i1 != 0 ? i1 : i2 != 0 ? i2 : i3;
+    }
 }
