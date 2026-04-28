@@ -5,6 +5,7 @@ import java.time.Month;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Consumer;
@@ -29,8 +30,7 @@ public class App {
                                 .genero(Genero.HOMBRE)
                                 .salario(1000)
                                 .build());
-                personas.add(
-                                Persona.builder()
+                personas.add(Persona.builder()
                                                 .nombre("Carolina")
                                                 .primerApellido("Garzon")
                                                 .segundoApellido("Becerra")
@@ -60,6 +60,15 @@ public class App {
                                 .salario(1600)
                                 .build());
 
+                personas.add(Persona.builder()
+                                .nombre("Luis")
+                                .primerApellido("Arenal")
+                                .segundoApellido("Gomez")
+                                .fechaNacimiento(LocalDate.of(1989,
+                                                Month.MAY, 22))
+                                .genero(Genero.HOMBRE)
+                                .salario(21000)
+                                .build());
                 // personas.forEach(System.out::println);
                 /**
                  * Iterator<Persona> it = personas.iterator();
@@ -109,8 +118,7 @@ public class App {
                                 return Persona.builder()
                                                 .nombre(persona.nombre())
                                                 .primerApellido(persona.primerApellido())
-                                                .segundoApellido(
-                                                                persona.segundoApellido())
+                                                .segundoApellido(persona.segundoApellido())
                                                 .fechaNacimiento(persona.fechaNacimiento())
                                                 .genero(persona.genero())
                                                 .salario(persona.salario() * 2)
@@ -145,5 +153,24 @@ public class App {
                 List<String> listaMutable = Arrays.asList("Jerónimo", "Duglas", "Carolina");
                 Collections.sort(listaMutable);
                 System.out.println(listaMutable);
+                Collections.sort(personas);
+                personas.stream().forEach(p -> System.err.println(p));
+                Collections.sort(personas, (p1, p2) -> Double.valueOf(p1.salario()).compareTo(p2.salario()));
+                personas.stream().forEach(System.out::println);
+                Collections.sort(personas, Comparator.comparingDouble(Persona::salario));
+                personas.stream().forEach(System.out::println);
+                Collections.sort(personas, Comparator.comparingDouble(Persona::salario).reversed());
+                personas.stream().forEach(System.out::println);
+                listaInmutable.stream().sorted().forEach(System.out::println);
+                // EJERCICIO: ordenar por género y después por salario mayor
+                personas.stream()
+                                .sorted(Comparator.comparing(Persona::genero)
+                                        .thenComparing(Comparator.comparingDouble(Persona::salario).reversed()))
+                                .forEach(System.out::println);
+                personas.stream()
+                                .sorted(Comparator.comparing((Persona p) -> p.genero().toString())
+                                        .thenComparing(Comparator.comparingDouble(Persona::salario).reversed()))
+                                .forEach(System.out::println);
+
         }
 }
