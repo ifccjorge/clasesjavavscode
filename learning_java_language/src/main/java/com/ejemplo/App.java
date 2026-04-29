@@ -3,174 +3,62 @@ package com.ejemplo;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.ToDoubleFunction;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 public class App {
 
-        public static void main(String[] args) {
-                Integer[] arrayNumerosEnteros = { 1, 2, 3, 4, 5 };
-                List<Integer> numerosEnteros = Arrays.asList(arrayNumerosEnteros);
-                numerosEnteros.forEach(System.out::println);
-                List<Persona> personas = new ArrayList<>();
-                personas.add(Persona.builder()
-                                .nombre("Duglas")
-                                .primerApellido("Taydron")
-                                .segundoApellido("Gonzalez")
-                                .fechaNacimiento(LocalDate.of(1995,
-                                                Month.JANUARY, 20))
-                                .genero(Genero.HOMBRE)
-                                .salario(1000)
-                                .build());
-                personas.add(Persona.builder()
-                                                .nombre("Carolina")
-                                                .primerApellido("Garzon")
-                                                .segundoApellido("Becerra")
-                                                .fechaNacimiento(LocalDate.of(2000,
-                                                                Month.OCTOBER, 10))
-                                                .genero(Genero.MUJER)
-                                                .salario(1200)
-                                                .build());
+    public static void main(String[] args) {
+        // Definición de lista y set
+        List<? super Producto> lista = new ArrayList<>();
+        Set<Telefono> telefonos = new HashSet<>();
+        Set<Coche> coches = new HashSet<>();
 
-                personas.add(Persona.builder()
-                                .nombre("Maria")
-                                .primerApellido("Garzon")
-                                .segundoApellido("Glez")
-                                .fechaNacimiento(LocalDate.of(2005,
-                                                Month.DECEMBER, 14))
-                                .genero(Genero.MUJER)
-                                .salario(1400)
-                                .build());
+        // Inserta datos en la lista
+        lista.add(Telefono.builder().nombre("Samsung Galaxy A16").marca("Samsung").modelo("Galaxy A16").stock(5)
+                .build());
+        lista.add(Telefono.builder().nombre("Xiaomi REDMI Note 14").marca("Xiaomi").modelo("REDMI Note 14")
+                .stock(2).build());
+        lista.add(Coche.builder().nombre("Peugeot 208 Hibryd").marca("Peugeot").modelo("208 Hibryd")
+                .fechaMatriculacion(LocalDate.of(2024, Month.APRIL, 2)).build());
+        lista.add(Coche.builder().nombre("Hyundai i30 Híbrido 48V").marca("Hyundai").modelo("i30 Híbrido 48V")
+                .fechaMatriculacion(LocalDate.of(2023, Month.DECEMBER, 12)).build());
 
-                personas.add(Persona.builder()
-                                .nombre("Jeronimo")
-                                .primerApellido("Arenal")
-                                .segundoApellido("Gomez")
-                                .fechaNacimiento(LocalDate.of(1989,
-                                                Month.MAY, 22))
-                                .genero(Genero.HOMBRE)
-                                .salario(1600)
-                                .build());
-
-                personas.add(Persona.builder()
-                                .nombre("Luis")
-                                .primerApellido("Arenal")
-                                .segundoApellido("Gomez")
-                                .fechaNacimiento(LocalDate.of(1989,
-                                                Month.MAY, 22))
-                                .genero(Genero.HOMBRE)
-                                .salario(21000)
-                                .build());
-                // personas.forEach(System.out::println);
-                /**
-                 * Iterator<Persona> it = personas.iterator();
-                 * while (it.hasNext()) {
-                 * Persona persona = it.next();
-                 * if (persona.getGenero().equals(Genero.MUJER)) {
-                 * System.out.println("Se excluye: " + persona);
-                 * it.remove();
-                 * } else
-                 * System.out.println("Se incluye: " + persona);
-                 * }
-                 * System.out.println("Número: " + personas.size());
-                 * System.out.println(personas);
-                 */
-                // Ejercicio
-                Iterator<Persona> it = personas.iterator();
-                while (it.hasNext()) {
-                        Persona persona = it.next();
-                        if (persona.genero().equals(Genero.HOMBRE) && persona.nombre().length() == 6) {
-                                System.out.println("Se excluye: " + persona);
-                                it.remove();
-                        } else
-                                System.out.println("Se incluye: " + persona);
+        // Recorre todos los productos con for mejorado
+        // switch expression con Pattern Matching
+        // for (Object producto : lista) {
+        //         switch (producto) {
+        //                 case Telefono telefono -> {
+        //                         System.out.println(telefono);
+        //                         telefonos.add(telefono);
+        //                 }
+        //                 case Coche coche -> {
+        //                         System.out.println(coche);
+        //                         coches.add(coche);
+        //                 }
+        //                 default -> System.out.println("Error");
+        //         }
+        // }
+        /* Utilizando operaciones de agregado para recorrer la lista */
+        lista.forEach(obj -> {
+            switch (obj) {
+                case Telefono telefono -> {
+                    System.out.println(telefono);
+                    telefonos.add(telefono);
                 }
-                System.out.println("Número: " + personas.size());
-                System.out.println(personas);
-                // Traversing collection con funciones de agregado
-                Predicate<Persona> predicadoGenero1 = new Filtro();
-                @SuppressWarnings("Convert2Lambda")
-                Predicate<Persona> predicadoGenero2 = new Predicate<Persona>() {
-                        @Override
-                        public boolean test(Persona p) {
-                                return p.genero().equals(Genero.MUJER);
-                        }
-                };
-                @SuppressWarnings("Convert2Lambda")
-                Consumer<Persona> cnsmr = new Consumer<Persona>() {
-                        @Override
-                        public void accept(Persona persona) {
-                                System.out.println("*** " + persona + " ***");
-                        }
-                };
-                @SuppressWarnings("Convert2Lambda")
-                Function<Persona, Persona> fnctn = new Function<Persona, Persona>() {
-                        @Override
-                        public Persona apply(Persona persona) {
-                                return Persona.builder()
-                                                .nombre(persona.nombre())
-                                                .primerApellido(persona.primerApellido())
-                                                .segundoApellido(persona.segundoApellido())
-                                                .fechaNacimiento(persona.fechaNacimiento())
-                                                .genero(persona.genero())
-                                                .salario(persona.salario() * 2)
-                                                .build();
-                        }
-                };
-                @SuppressWarnings("Convert2Lambda")
-                ToDoubleFunction<Persona> tdf = new ToDoubleFunction<Persona>() {
-                        @Override
-                        public double applyAsDouble(Persona persona) {
-                                return persona.salario();
-                        }
-                };
-                // Clase externa
-                personas.stream().filter(predicadoGenero1).map(fnctn).forEach(cnsmr);
-                // Clase anónima
-                System.out.println(personas.stream().filter(predicadoGenero2).mapToDouble(tdf).average().getAsDouble());
-                // Expresión lambda
-                System.out.println(personas.stream().filter(p -> p.genero()
-                                .equals(Genero.MUJER)).mapToDouble(p -> p.salario()).average()
-                                .orElse(0));
-                // Método por referencia
-                System.out.println(personas.stream().filter(p -> p.genero()
-                                .equals(Genero.MUJER)).mapToDouble(Persona::salario).average()
-                                .orElse(0));
-                // Ordenamiento
-                List<String> listaInmutable = List.of("Jerónimo", "Duglas", "Carolina");
-                List<String> sortedList1 = listaInmutable.stream().sorted().collect(Collectors.toList());
-                System.out.println(sortedList1);
-                List<String> sortedList2 = listaInmutable.stream().sorted().toList();
-                System.out.println(sortedList2);
-                List<String> listaMutable = Arrays.asList("Jerónimo", "Duglas", "Carolina");
-                Collections.sort(listaMutable);
-                System.out.println(listaMutable);
-                Collections.sort(personas);
-                personas.stream().forEach(p -> System.err.println(p));
-                Collections.sort(personas, (p1, p2) -> Double.valueOf(p1.salario()).compareTo(p2.salario()));
-                personas.stream().forEach(System.out::println);
-                Collections.sort(personas, Comparator.comparingDouble(Persona::salario));
-                personas.stream().forEach(System.out::println);
-                Collections.sort(personas, Comparator.comparingDouble(Persona::salario).reversed());
-                personas.stream().forEach(System.out::println);
-                listaInmutable.stream().sorted().forEach(System.out::println);
-                // EJERCICIO: ordenar por género y después por salario mayor
-                personas.stream()
-                                .sorted(Comparator.comparing(Persona::genero)
-                                        .thenComparing(Comparator.comparingDouble(Persona::salario).reversed()))
-                                .forEach(System.out::println);
-                personas.stream()
-                                .sorted(Comparator.comparing((Persona p) -> p.genero().toString())
-                                        .thenComparing(Comparator.comparingDouble(Persona::salario).reversed()))
-                                .forEach(System.out::println);
-
-        }
+                case Coche coche -> {
+                    System.out.println(coche);
+                    coches.add(coche);
+                }
+                default ->
+                    System.out.println("Error");
+            }
+        });
+        // Muestra los set
+        System.out.println(telefonos.size() + " teléfonos registrados:");
+        telefonos.forEach(System.out::println);
+        System.out.println(coches.size() + " coches registrados:");
+        coches.forEach(System.out::println);
+    }
 }
