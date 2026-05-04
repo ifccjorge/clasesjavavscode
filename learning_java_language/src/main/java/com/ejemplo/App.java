@@ -1,13 +1,22 @@
 package com.ejemplo;
 
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.format.TextStyle;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
+import java.util.Locale;
+
 public class App {
-    // Polimorfimo
-    // public class Persona extends Object implements Bicicleta
-    Persona persona1 = new Persona(); // referencia al mismo tipo del objeto
-    Object objeto = persona1; // referencia a un supertipo (casting implícito)
-    @SuppressWarnings("unused")
-    Persona persona2 = (Persona) objeto; // referencia a un subtipo (casting explícito)
-    Bicicleta bicicleta = persona1; // referencia a interfaz implementada en una clase (casting implícito)
-    @SuppressWarnings("unused")
-    Persona persona3 = (Persona) bicicleta; // referencia a una clase desde interfaz implementada (casting explícito)
+    public static void main(String[] args) {
+        LocalDate today = LocalDate.now();
+        System.out.println("Hoy es " + today);
+        LocalDate cobro = today.with(TemporalAdjusters.lastDayOfMonth()).minusDays(2);
+        System.out.println("Fecha del cobro " + cobro);
+        LocalDate fecha = LocalDate.of(1963, Month.JANUARY, 22).plusYears(1);
+        System.out.println(fecha.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.FRANCE));
+        // Locale locale = Locale.of("ja", "JP");
+        // System.out.println(fecha.getMonth().getDisplayName(TextStyle.FULL, locale));
+        System.out.println(ChronoUnit.YEARS.between(fecha, today));
+    }
 }
