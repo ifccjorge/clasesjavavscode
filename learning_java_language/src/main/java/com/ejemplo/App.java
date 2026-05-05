@@ -1,33 +1,35 @@
 package com.ejemplo;
 
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.Period;
-import java.time.format.TextStyle;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalAdjusters;
-import java.util.Locale;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class App {
 
     public static void main(String[] args) {
-        LocalDate today = LocalDate.now();
-        System.out.println("Hoy es " + today);
-        LocalDate cobro = today.with(TemporalAdjusters.lastDayOfMonth()).minusDays(2);
-        System.out.println("Fecha del cobro " + cobro);
-        LocalDate fecha = LocalDate.of(1963, Month.JANUARY, 22).plusYears(1);
-        System.out.println(fecha.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.FRANCE));
-        Locale locale = Locale.of("ja", "JP");
-        System.out.println(fecha.getMonth().getDisplayName(TextStyle.FULL, locale));
-        System.out.println(ChronoUnit.YEARS.between(fecha, today));
-        LocalDate proximo = fecha.withYear(today.getYear());
-        if (proximo.isBefore(today) || proximo.isEqual(today)) {
-            proximo = proximo.plusYears(1);
+        List<String> listadoDeArgumentos = Arrays.asList(args);
+        listadoDeArgumentos.forEach(System.out::println);
+        Map<String, Integer> m1 = new HashMap<>();
+        Map<String, Integer> m2 = new HashMap<>();
+        Map<String, Integer> m3 = new HashMap<>();
+        for (String nombre : listadoDeArgumentos) {
+            if (m1.containsKey(nombre)) {
+                m1.put(nombre, m1.get(nombre) + 1);
+            } else {
+                m1.put(nombre, 1);
+            }
         }
-        Period p1 = Period.between(today, proximo);
-        long p2 = ChronoUnit.DAYS.between(today, proximo);
-        System.out.println("There are " + p1.getMonths() + " months, and "
-                + p1.getDays() + " days until your next birthday. ("
-                + p2 + " total)");
+        System.out.println(m1);
+        listadoDeArgumentos.forEach(s -> {
+            Integer i = m2.get(s);
+            m2.put(s, i == null ? 1 : i + 1);
+        });
+        System.out.println(m2);
+        listadoDeArgumentos.forEach(s -> m3.put(s, m3.getOrDefault(s, 0) + 1));
+        System.out.println(m3);
+        Map<String, Long> m4 = listadoDeArgumentos.stream().collect(Collectors.groupingBy(s -> s, Collectors.counting()));
+        System.out.println(m4);
     }
 }
