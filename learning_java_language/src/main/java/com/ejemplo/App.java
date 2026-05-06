@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class App {
@@ -29,7 +30,9 @@ public class App {
         System.out.println(m2);
         listadoDeArgumentos.forEach(s -> m3.put(s, m3.getOrDefault(s, 0) + 1));
         System.out.println(m3);
-        Map<String, Long> m4 = listadoDeArgumentos.stream().collect(Collectors.groupingBy(s -> s, Collectors.counting()));
+        Map<String, Long> m4 = listadoDeArgumentos.stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
         System.out.println(m4);
+        Map<String, Long> m5 = listadoDeArgumentos.stream().collect(Collectors.groupingBy(s -> s.substring(0, 1), Collectors.counting()));
+        System.out.println(m5);
     }
 }
