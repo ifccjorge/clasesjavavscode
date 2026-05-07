@@ -3,10 +3,14 @@ package com.ejemplo;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+import static java.util.stream.Collectors.averagingDouble;
+import static java.util.stream.Collectors.groupingBy;
 
 public class App {
 
@@ -122,17 +126,76 @@ public class App {
                 .fechaAlta(LocalDate.of(2015, Month.SEPTEMBER, 22))
                 .build();
 
-        List<Empleado> empleados = Arrays.asList(emp1, emp2, emp3, emp4, emp5, emp6, emp7, emp8, emp9, emp10);
-        Map<Genero, List<Empleado>> empleadosPorGenero = empleados.stream()
+        Estudiante estudiante1 = Estudiante.builder()
+                .nombre("Alex Eduardo")
+                .primerApellido("Pilicita")
+                .segundoApellido("Changoluisa")
+                .genero(Genero.HOMBRE)
+                .fechaNacimiento(LocalDate.of(1991, Month.MAY, 25))
+                .totalAsignaturas(10)
+                .facultad(Facultad.INGENIERIA)
+                .fechaAltaFacultad(LocalDate.of(2020, Month.JANUARY, 6))
+                .build();
+
+        // Map por Genero
+        List<Empleado> empleados1 = Arrays.asList(emp1, emp2, emp3, emp4, emp5, emp6, emp7, emp8, emp9, emp10);
+        Map<Genero, List<Empleado>> empleadosPorGenero = empleados1.stream()
                 .collect(Collectors.groupingBy(Empleado::getGenero, Collectors.toList()));
         System.out.println(empleadosPorGenero);
-        /*
-        List<? super Persona> empleados2 = Arrays.asList(emp1, emp2, emp3, emp4, emp5, emp6, emp7, emp8, emp9, emp10);
+        // Map por Genero excluyendo estudiantes
+        List<? super Persona> empleados2 = Arrays.asList(emp1, emp2, emp3, emp4, emp5, emp6, emp7, emp8, emp9, emp10, estudiante1);
         Map<Genero, List<Empleado>> empleadosPorGenero2 = empleados2.stream()
                 .filter(obj -> obj instanceof Empleado)
                 .map(obj -> (Empleado) obj)
-                .collect(Collectors.groupingBy(Empleado::getGenero, Collectors.toList()));
-         */
-
+                .collect(Collectors.groupingBy(Empleado::getGenero));
+        System.out.println(empleadosPorGenero2);
+        // Map por Dpto y Genero excluyendo estudiantes
+        Map<Dpto, Map<Genero, List<Empleado>>> empleadoPorDptoGenero = empleados2.stream()
+                .filter(obj -> obj instanceof Empleado)
+                .map(obj -> (Empleado) obj)
+                .collect(
+                        Collectors.groupingBy(
+                                Empleado::getDpto,
+                                Collectors.groupingBy(Empleado::getGenero)
+                        )
+                );
+        System.out.println(empleadoPorDptoGenero);
+        // Map de nombres sin repetir por género
+        Map<Genero, Set<String>> nombresPorGeneroSinRepeticion = empleados2.stream()
+                .filter(Empleado.class::isInstance)
+                .map(obj -> (Empleado) obj)
+                .collect(
+                        Collectors.groupingBy(
+                                Empleado::getGenero,
+                                Collectors.mapping(Empleado::getNombre, Collectors.toSet())
+                        )
+                );
+        System.out.println(nombresPorGeneroSinRepeticion);
+        // Map de nombres por edad
+        Map<Long, String> nombresPorEdad = empleados1.stream()
+                .collect(
+                        Collectors.groupingBy(
+                                emp -> ChronoUnit.YEARS.between(emp.getFechaNacimiento(), LocalDate.now()),
+                                Collectors.mapping(
+                                        Empleado::getNombre,
+                                        Collectors.joining(",")
+                                )
+                        )
+                );
+        System.out.println(nombresPorEdad);
+        // Salario medio por fecha de alta solo para mujer
+        Map<LocalDate, Map<Genero, Double>> salarioMedioPorFecha = empleados2.stream()
+                .filter(obj -> obj instanceof Empleado emp && emp.getGenero().equals(Genero.MUJER))
+                .map(obj -> (Empleado) obj)
+                .collect(
+                        groupingBy(
+                                Empleado::getFechaAlta,
+                                groupingBy(
+                                        Empleado::getGenero,
+                                        averagingDouble(emp -> emp.getSalario().doubleValue())
+                                )
+                        )
+                );
+        System.out.println("Salario medio por fecha: " + salarioMedioPorFecha);
     }
 }

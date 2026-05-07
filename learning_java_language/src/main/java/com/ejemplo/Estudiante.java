@@ -21,5 +21,5 @@ public class Estudiante extends Persona {
 
     private Facultad facultad;
     private int totalAsignaturas;
-    private LocalDate fechaAlta;
+    private LocalDate fechaAltaFacultad;
 }
