@@ -69,7 +69,7 @@ public class App {
 
     // Definición de vuelos
     Vuelo vuelo1 = Vuelo.builder()
-        .destino("Nueva York")
+        .destino(Destino.NUEVA_YORK)
         .precio(750.50)
         .fechaSalida(LocalDate.of(2026, Month.JULY, 1))
         .horaSalida(LocalTime.of(12, 30))
@@ -78,7 +78,7 @@ public class App {
         .numeroPlazas(3)
         .build();
     Vuelo vuelo2 = Vuelo.builder()
-        .destino("Tokio")
+        .destino(Destino.TOKIO)
         .precio(850.50)
         .fechaSalida(LocalDate.of(2026, Month.JUNE, 8))
         .horaSalida(LocalTime.of(9, 20))
@@ -87,7 +87,7 @@ public class App {
         .numeroPlazas(2)
         .build();
     Vuelo vuelo3 = Vuelo.builder()
-        .destino("Barcelona")
+        .destino(Destino.BARCELONA)
         .precio(95.50)
         .fechaSalida(LocalDate.of(2026, Month.MAY, 30))
         .horaSalida(LocalTime.of(23, 45))
@@ -96,7 +96,7 @@ public class App {
         .numeroPlazas(3)
         .build();
     Vuelo vuelo4 = Vuelo.builder()
-        .destino("Berlín")
+        .destino(Destino.BERLIN)
         .precio(150.50)
         .fechaSalida(LocalDate.of(2026, Month.MAY, 10))
         .horaSalida(LocalTime.of(13, 00))
@@ -105,7 +105,7 @@ public class App {
         .numeroPlazas(3)
         .build();
     Vuelo vuelo5 = Vuelo.builder()
-        .destino("Buenos Aires")
+        .destino(Destino.BUENOS_AIRES)
         .precio(550.50)
         .fechaSalida(LocalDate.of(2026, Month.MAY, 22))
         .horaSalida(LocalTime.of(21, 00))
@@ -114,7 +114,7 @@ public class App {
         .numeroPlazas(3)
         .build();
     Vuelo vuelo6 = Vuelo.builder()
-        .destino("Praga")
+        .destino(Destino.PRAGA)
         .precio(125.50)
         .fechaSalida(LocalDate.of(2026, Month.MAY, 31))
         .horaSalida(LocalTime.of(10, 20))
@@ -219,7 +219,7 @@ public class App {
     System.out
         .println(
             "*** 5. Obtener una colección que almacene un listado de pasajeros agrupado por el destino del vuelo.");
-    Map<String, Set<Pasajero>> pasajerosPorDestino = vuelos.stream().collect(
+    Map<Destino, Set<Pasajero>> pasajerosPorDestino = vuelos.stream().collect(
         Collectors.groupingBy(
             Vuelo::getDestino,
             Collectors.flatMapping(v -> v.getPasajeros().stream(), Collectors.toSet())));
