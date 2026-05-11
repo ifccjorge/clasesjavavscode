@@ -1,250 +1,329 @@
 package com.ejemplo;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.Month;
-import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.Collections;
+import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-import static java.util.stream.Collectors.averagingDouble;
-import static java.util.stream.Collectors.groupingBy;
 
 public class App {
 
   public static void main(String[] args) {
 
-    Empleado emp1 = Empleado.builder()
-      .nombre("Jorge Francisco")
-      .primerApellido("Alborch")
-      .segundoApellido("Villar")
-      .genero(Genero.HOMBRE)
-      .fechaNacimiento(LocalDate.of(1973, Month.JUNE, 23))
-      .dpto(Dpto.INFORMATICA)
-      .salario(new BigDecimal(3500.50))
-      .fechaAlta(LocalDate.of(1990, Month.SEPTEMBER, 22))
-      .build();
+    // Definición de pasajeros
+    Pasajero pasajero1 = new Pasajero(
+        "Luis",
+        "González",
+        "Martínez",
+        LocalDate.of(2001, Month.FEBRUARY, 10),
+        Genero.HOMBRE);
+    Pasajero pasajero2 = new Pasajero(
+        "Mariana",
+        "Páez",
+        "López",
+        LocalDate.of(2000, Month.AUGUST, 2),
+        Genero.MUJER);
+    Pasajero pasajero3 = new Pasajero(
+        "Juan",
+        "Díaz",
+        "Palacios",
+        LocalDate.of(2001, Month.MARCH, 30),
+        Genero.HOMBRE);
+    Pasajero pasajero4 = new Pasajero(
+        "Beatriz",
+        "Benítez",
+        "Peláez",
+        LocalDate.of(2005, Month.NOVEMBER, 20),
+        Genero.MUJER);
+    Pasajero pasajero5 = new Pasajero(
+        "Rafael",
+        "Montero",
+        "Álvarez",
+        LocalDate.of(2001, Month.FEBRUARY, 10),
+        Genero.HOMBRE);
+    Pasajero pasajero6 = new Pasajero(
+        "Julia",
+        "Gómez",
+        "Hernández",
+        LocalDate.of(1991, Month.JANUARY, 22),
+        Genero.MUJER);
+    Pasajero pasajero7 = new Pasajero(
+        "José Luis",
+        "Fernández",
+        "García",
+        LocalDate.of(1999, Month.OCTOBER, 3),
+        Genero.HOMBRE);
+    Pasajero pasajero8 = new Pasajero(
+        "Irene",
+        "Pérez",
+        "Jiménez",
+        LocalDate.of(1994, Month.APRIL, 19),
+        Genero.MUJER);
 
-    Empleado emp2 = Empleado.builder()
-      .nombre("Andres")
-      .primerApellido("Alonso")
-      .segundoApellido("Pelaez")
-      .genero(Genero.HOMBRE)
-      .fechaNacimiento(LocalDate.of(1983, Month.SEPTEMBER, 23))
-      .dpto(Dpto.INFORMATICA)
-      .salario(new BigDecimal(3400.50))
-      .fechaAlta(LocalDate.of(1995, Month.SEPTEMBER, 22))
-      .build();
+    // Definición de vuelos
+    Vuelo vuelo1 = Vuelo.builder()
+        .destino("Nueva York")
+        .precio(750.50)
+        .fechaSalida(LocalDate.of(2026, Month.JULY, 1))
+        .horaSalida(LocalTime.of(12, 30))
+        .fechaLlegada(LocalDate.of(2026, Month.JULY, 1))
+        .horaLlegada(LocalTime.of(19, 30))
+        .numeroPlazas(3)
+        .build();
+    Vuelo vuelo2 = Vuelo.builder()
+        .destino("Tokio")
+        .precio(850.50)
+        .fechaSalida(LocalDate.of(2026, Month.JUNE, 8))
+        .horaSalida(LocalTime.of(9, 20))
+        .fechaLlegada(LocalDate.of(2026, Month.JUNE, 8))
+        .horaLlegada(LocalTime.of(19, 40))
+        .numeroPlazas(2)
+        .build();
+    Vuelo vuelo3 = Vuelo.builder()
+        .destino("Barcelona")
+        .precio(95.50)
+        .fechaSalida(LocalDate.of(2026, Month.MAY, 30))
+        .horaSalida(LocalTime.of(23, 45))
+        .fechaLlegada(LocalDate.of(2026, Month.MAY, 31))
+        .horaLlegada(LocalTime.of(0, 55))
+        .numeroPlazas(3)
+        .build();
+    Vuelo vuelo4 = Vuelo.builder()
+        .destino("Berlín")
+        .precio(150.50)
+        .fechaSalida(LocalDate.of(2026, Month.MAY, 10))
+        .horaSalida(LocalTime.of(13, 00))
+        .fechaLlegada(LocalDate.of(2026, Month.MAY, 10))
+        .horaLlegada(LocalTime.of(14, 55))
+        .numeroPlazas(3)
+        .build();
+    Vuelo vuelo5 = Vuelo.builder()
+        .destino("Buenos Aires")
+        .precio(550.50)
+        .fechaSalida(LocalDate.of(2026, Month.MAY, 22))
+        .horaSalida(LocalTime.of(21, 00))
+        .fechaLlegada(LocalDate.of(2026, Month.MAY, 23))
+        .horaLlegada(LocalTime.of(9, 25))
+        .numeroPlazas(3)
+        .build();
+    Vuelo vuelo6 = Vuelo.builder()
+        .destino("Praga")
+        .precio(125.50)
+        .fechaSalida(LocalDate.of(2026, Month.MAY, 31))
+        .horaSalida(LocalTime.of(10, 20))
+        .fechaLlegada(LocalDate.of(2026, Month.MAY, 31))
+        .horaLlegada(LocalTime.of(12, 15))
+        .numeroPlazas(3)
+        .build();
+    // Definición de listados
+    List<Pasajero> pasajeros = List.of(pasajero1, pasajero2, pasajero3, pasajero4, pasajero5, pasajero6, pasajero7,
+        pasajero8);
+    List<Vuelo> vuelos = List.of(vuelo1, vuelo2, vuelo3, vuelo4, vuelo5, vuelo6);
+    // System.out.println(pasajeros);
+    // System.out.println(vuelos);
+    // vuelos.stream().map(Vuelo::minutosVuelo).forEach(System.out::println);
 
-    Empleado emp3 = Empleado.builder()
-      .nombre("Jeronimo")
-      .primerApellido("Arenal")
-      .segundoApellido("Gomez")
-      .genero(Genero.HOMBRE)
-      .fechaNacimiento(LocalDate.of(1968, Month.OCTOBER, 20))
-      .dpto(Dpto.CONTABILIDAD)
-      .salario(new BigDecimal(3600.50))
-      .fechaAlta(LocalDate.of(1977, Month.JANUARY, 4))
-      .build();
+    // Alta de pasajeros en los vuelos
+    vuelo1.incluirPasajero(pasajero1);
+    // vuelo1.incluirPasajero(pasajero1);
+    // vuelo1.excluirPasajero(pasajero1);
+    // vuelo1.excluirPasajero(pasajero1);
+    vuelo1.incluirPasajero(pasajero2);
+    vuelo2.incluirPasajero(pasajero3);
+    vuelo2.incluirPasajero(pasajero4);
+    vuelo3.incluirPasajero(pasajero5);
+    vuelo4.incluirPasajero(pasajero6);
+    // vuelos.stream().map(Vuelo::plazasDisponibles).forEach(System.out::println);
+    // vuelos.stream().forEach(Vuelo::descripcion);
+    // vuelos.stream().map(p -> p.esPasajeroVuelo(pasajero1)).forEach(System.out::println);
 
-    Empleado emp4 = Empleado.builder()
-      .nombre("Carolina")
-      .primerApellido("Garzon")
-      .segundoApellido("Becerra")
-      .genero(Genero.MUJER)
-      .fechaNacimiento(LocalDate.of(2001, Month.JUNE, 7))
-      .dpto(Dpto.INFORMATICA)
-      .salario(new BigDecimal(3700.50))
-      .fechaAlta(LocalDate.of(2020, Month.SEPTEMBER, 10))
-      .build();
+    // Vuelos con más pasajeros: SOLUCIÓN 1
+    System.out.println("*** Vuelos con más pasajeros: SOLUCIÓN 1 ***");
+    List<Vuelo> vuelosMasPasajeros = new ArrayList<>();
+    int mayorNumeroPasajeros = 0;
+    for (Vuelo vuelo : vuelos) {
+      int numeroPasajeros = vuelo.getPasajeros().size();
+      if (numeroPasajeros > mayorNumeroPasajeros) {
+        mayorNumeroPasajeros = numeroPasajeros;
+        vuelosMasPasajeros.clear();
+      }
+      if (numeroPasajeros == mayorNumeroPasajeros) {
+        vuelosMasPasajeros.add(vuelo);
+      }
+    }
+    System.out.println("Hay " + vuelosMasPasajeros.size() + " vuelos con " + mayorNumeroPasajeros + " pasajeros: "
+        + vuelosMasPasajeros);
 
-    Empleado emp5 = Empleado.builder()
-      .nombre("Mariana")
-      .primerApellido("Garzon")
-      .segundoApellido("Villar")
-      .genero(Genero.MUJER)
-      .fechaNacimiento(LocalDate.of(2000, Month.AUGUST, 4))
-      .dpto(Dpto.FINANZAS)
-      .salario(new BigDecimal(3300.50))
-      .fechaAlta(LocalDate.of(2022, Month.SEPTEMBER, 25))
-      .build();
+    // Vuelos con más pasajeros: SOLUCIÓN 2
+    System.out.println("*** Vuelos con más pasajeros: SOLUCIÓN 2 ***");
+    Map<Integer, List<Vuelo>> pasajerosVuelo1 = vuelos.stream().collect(
+        Collectors.groupingBy(v -> v.getPasajeros().size()));
+    SortedMap<Integer, List<Vuelo>> pasajerosVueloInverso = new TreeMap<>(Comparator.reverseOrder());
+    pasajerosVueloInverso.putAll(pasajerosVuelo1);
+    int mayor1 = pasajerosVueloInverso.firstKey();
+    System.out.println("Para " + mayor1 + " hay " + pasajerosVueloInverso.get(mayor1));
 
-    Empleado emp6 = Empleado.builder()
-      .nombre("Francisca")
-      .primerApellido("Alvarez")
-      .segundoApellido("Glez")
-      .genero(Genero.MUJER)
-      .fechaNacimiento(LocalDate.of(1995, Month.DECEMBER, 10))
-      .dpto(Dpto.RRHH)
-      .salario(new BigDecimal(2500.50))
-      .fechaAlta(LocalDate.of(2010, Month.SEPTEMBER, 5))
-      .build();
+    // Vuelos con más pasajeros: SOLUCIÓN 3
+    System.out.println("*** Vuelos con más pasajeros: SOLUCIÓN 3 ***");
+    SortedMap<Integer, List<Vuelo>> pasajerosVuelo2 = vuelos.stream().collect(
+      Collectors.groupingBy(
+        v -> v.getPasajeros().size(),
+        TreeMap::new,
+        Collectors.toList()
+      )
+    );
+    int mayor2 = pasajerosVuelo2.lastKey();
+    System.out.println("Para " + mayor2 + " hay " + pasajerosVueloInverso.get(mayor2));
+    // Vuelos con más pasajeros: SOLUCIÓN 4
+    System.out.println("*** Vuelos con más pasajeros: SOLUCIÓN 4 ***");
+    SortedMap<Integer, List<Vuelo>> col = vuelos.stream().collect(
+      Collectors.toMap(
+        v -> v.getPasajeros().size(),
+        b -> new ArrayList<Vuelo>(List.of(b)),
+        (list1, list2) -> {
+          list1.addAll(list2);
+          return list1;
+        },
+        TreeMap::new
+      )
+    );
+    System.out.println(col.lastKey());
 
-    Empleado emp7 = Empleado.builder()
-      .nombre("Maricarmen")
-      .primerApellido("Becerra")
-      .segundoApellido("Mtnez")
-      .genero(Genero.MUJER)
-      .fechaNacimiento(LocalDate.of(2003, Month.FEBRUARY, 14))
-      .dpto(Dpto.FINANZAS)
-      .salario(new BigDecimal(2600.50))
-      .fechaAlta(LocalDate.of(2021, Month.SEPTEMBER, 8))
-      .build();
+    // 1. Obtener un listado de los vuelos que tienen el número de plazas completo.
+    System.out.println("*** 1. Obtener un listado de los vuelos que tienen el número de plazas completo.");
+    vuelos.stream().filter(v -> v.plazasDisponibles() == 0).forEach(System.out::println);
 
-    Empleado emp8 = Empleado.builder()
-      .nombre("Eva")
-      .primerApellido("Cornide")
-      .segundoApellido("Machado")
-      .genero(Genero.MUJER)
-      .fechaNacimiento(LocalDate.of(1990, Month.MAY, 18))
-      .dpto(Dpto.INFORMATICA)
-      .salario(new BigDecimal(3500.50))
-      .fechaAlta(LocalDate.of(2015, Month.SEPTEMBER, 22))
-      .build();
+    // 2. Obtener un listado de los vuelos que tienen fecha de salida prevista para el día de hoy.
+    System.out
+        .println("*** 2. Obtener un listado de los vuelos que tienen fecha de salida prevista para el día de hoy.");
+    vuelos.stream().filter(v -> v.getFechaSalida().isEqual(LocalDate.now())).forEach(System.out::println);
 
-    Empleado emp9 = Empleado.builder()
-      .nombre("Alberto")
-      .primerApellido("Glez")
-      .segundoApellido("Sanchez")
-      .genero(Genero.HOMBRE)
-      .fechaNacimiento(LocalDate.of(1990, Month.FEBRUARY, 14))
-      .dpto(Dpto.FINANZAS)
-      .salario(new BigDecimal(2600.50))
-      .fechaAlta(LocalDate.of(2008, Month.SEPTEMBER, 8))
-      .build();
+    // 3. Obtener un listado de los vuelos cuya duración sea mayor de 10 horas.
+    System.out
+        .println("*** 3. Obtener un listado de los vuelos cuya duración sea mayor de 10 horas.");
+    vuelos.stream().filter(v -> v.minutosVuelo() > 600).forEach(System.out::println);
 
-    Empleado emp10 = Empleado.builder()
-      .nombre("Javier")
-      .primerApellido("Glez")
-      .segundoApellido("Sanchez")
-      .genero(Genero.HOMBRE)
-      .fechaNacimiento(LocalDate.of(1995, Month.MAY, 20))
-      .dpto(Dpto.RRHH)
-      .salario(new BigDecimal(3500.50))
-      .fechaAlta(LocalDate.of(2015, Month.SEPTEMBER, 22))
-      .build();
+    // 4. Obtener un listado de los vuelos que pueden demorar más de un día en llegar a su destino.
+    System.out
+        .println("*** 4. Obtener un listado de los vuelos que pueden demorar más de un día en llegar a su destino.");
+    vuelos.stream().filter(v -> !v.getFechaSalida().isEqual(v.getFechaLlegada())).forEach(System.out::println);
 
-    Estudiante estudiante1 = Estudiante.builder()
-      .nombre("Alex Eduardo")
-      .primerApellido("Pilicita")
-      .segundoApellido("Changoluisa")
-      .genero(Genero.HOMBRE)
-      .fechaNacimiento(LocalDate.of(1991, Month.MAY, 25))
-      .totalAsignaturas(10)
-      .facultad(Facultad.INGENIERIA)
-      .fechaAltaFacultad(LocalDate.of(2020, Month.JANUARY, 6))
-      .build();
+    // 5. Obtener una colección que almacene un listado de pasajeros agrupado por el destino del vuelo.
+    System.out
+        .println(
+            "*** 5. Obtener una colección que almacene un listado de pasajeros agrupado por el destino del vuelo.");
+    Map<String, Set<Pasajero>> pasajerosPorDestino = vuelos.stream().collect(
+        Collectors.groupingBy(
+            Vuelo::getDestino,
+            Collectors.flatMapping(v -> v.getPasajeros().stream(), Collectors.toSet())));
+    pasajerosPorDestino.entrySet().forEach(System.out::println);
 
-    // Map por Genero
-    List<Empleado> empleados1 = Arrays.asList(emp1, emp2, emp3, emp4, emp5, emp6, emp7, emp8, emp9, emp10);
-    Map<Genero, List<Empleado>> empleadosPorGenero = empleados1.stream()
-      .collect(Collectors.groupingBy(Empleado::getGenero, Collectors.toList()));
-    System.out.println(empleadosPorGenero);
-    // Map por Genero excluyendo estudiantes
-    List<? super Persona> empleados2 = Arrays.asList(emp1, emp2, emp3, emp4, emp5, emp6, emp7, emp8, emp9,
-      emp10, estudiante1);
-    Map<Genero, List<Empleado>> empleadosPorGenero2 = empleados2.stream()
-      .filter(obj -> obj instanceof Empleado)
-      .map(obj -> (Empleado) obj)
-      .collect(Collectors.groupingBy(Empleado::getGenero));
-    System.out.println(empleadosPorGenero2);
-    // Map por Dpto y Genero excluyendo estudiantes
-    Map<Dpto, Map<Genero, List<Empleado>>> empleadoPorDptoGenero = empleados2.stream()
-      .filter(obj -> obj instanceof Empleado)
-      .map(obj -> (Empleado) obj)
+    // 6.​ Crear una colección que almacene los vuelos que están programados para salir en los últimos 10 días del mes en curso.
+    System.out
+        .println(
+            "*** 6. Crear una colección que almacene los vuelos que están programados para salir en los últimos 10 días del mes en curso.");
+    LocalDate ultimoDiaMesActual = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth());
+    LocalDate fechaAnterior = ultimoDiaMesActual.minusDays(10);
+    SortedMap<LocalDate, List<Vuelo>> vuelosUltimosDias = vuelos.stream().filter(
+        v -> {
+          LocalDate fecha = v.getFechaSalida();
+          return fecha.isEqual(ultimoDiaMesActual) || fecha.isBefore(ultimoDiaMesActual) && fecha.isAfter(
+              fechaAnterior);
+        }).collect(
+            Collectors.groupingBy(
+                Vuelo::getFechaSalida,
+                TreeMap::new,
+                Collectors.toList()
+            )
+          );
+    System.out.println(vuelosUltimosDias);
+
+    // 7. Crear una colección que almacene los pasajeros, por el genero y la edad del pasajero.
+    System.out
+        .println(
+            "*** 7. Crear una colección que almacene los pasajeros, por el genero y la edad del pasajero.");
+    SortedMap<Genero, SortedMap<Integer, List<Pasajero>>> pasajerosPorGeneroEdad = pasajeros.stream().collect(
+      Collectors.groupingBy(
+        Pasajero::genero,
+        TreeMap::new,
+        Collectors.groupingBy(
+          Pasajero::edad,
+          TreeMap::new,
+          Collectors.toList()
+        )
+      )
+    );
+    System.out.println(pasajerosPorGeneroEdad);
+
+    // 8. Mostrar la colección anterior ordenada por el nombre y los apellidos de los pasajeros en orden natural.
+    System.out
+        .println(
+            "*** 8. Mostrar la colección anterior ordenada por el nombre y los apellidos de los pasajeros en orden natural.");
+    Comparator<Pasajero> cmprtr = (Pasajero p1, Pasajero p2) -> {
+      int i1 = p1.nombre().compareTo(p2.nombre());
+      int i2 = p1.primerApellido().compareTo(p2.primerApellido());
+      return i1 == 0 ? i2 : i1;
+    };
+    SortedMap<Genero, SortedMap<Integer, List<Pasajero>>> pasajerosPorGeneroEdadOrdenado = pasajeros
+      .stream()
+      .sorted(cmprtr)
       .collect(
         Collectors.groupingBy(
-          Empleado::getDpto,
-          Collectors.groupingBy(Empleado::getGenero)
-        )
-      );
-    System.out.println(empleadoPorDptoGenero);
-    // Map de nombres sin repetir por género
-    Map<Genero, Set<String>> nombresPorGeneroSinRepeticion = empleados2.stream()
-      .filter(Empleado.class::isInstance)
-      .map(obj -> (Empleado) obj)
-      .collect(
-        Collectors.groupingBy(
-          Empleado::getGenero,
-          Collectors.mapping(Empleado::getNombre, Collectors.toSet())
-        )
-      );
-    System.out.println(nombresPorGeneroSinRepeticion);
-    // Map de nombres por edad
-    Map<Long, String> nombresPorEdad = empleados1.stream()
-      .collect(
-        Collectors.groupingBy(
-          emp -> ChronoUnit.YEARS.between(emp.getFechaNacimiento(), LocalDate.now()),
-          Collectors.mapping(Empleado::getNombre, Collectors.joining(","))
-        )
-      );
-    System.out.println(nombresPorEdad);
-    // Salario medio por fecha de alta solo para mujer
-    Map<LocalDate, Map<Genero, Double>> salarioMedioPorFecha = empleados2.stream()
-      .filter(obj -> obj instanceof Empleado emp && emp.getGenero().equals(Genero.MUJER))
-      .map(obj -> (Empleado) obj)
-      .collect(
-        groupingBy(
-          Empleado::getFechaAlta,
-          groupingBy(
-            Empleado::getGenero,
-            averagingDouble(emp -> emp.getSalario().doubleValue())
+          Pasajero::genero,
+          TreeMap::new,
+          Collectors.groupingBy(
+            Pasajero::edad,
+            TreeMap::new,
+            Collectors.toList()
           )
         )
       );
-    System.out.println("Salario medio por fecha: " + salarioMedioPorFecha);
-    // Traversing
-    Map<String, Long> m = Map.of("a", 1L, "b", 2L, "c", 3L, "1", 10L, "2", 20L, "3", 30L);
-    for (Map.Entry<String, Long> entry : m.entrySet()) {
-      String k = entry.getKey();
-      Long v = entry.getValue();
-      if (v % 2 == 0) {
-        System.out.println(k + ": " + v);
-      }
-    }
-    m.entrySet().forEach(entry -> {
-      if (entry.getValue() % 2 == 0) {
-        System.out.println(entry.getKey() + ": " + entry.getValue());
-      }
-    });
-    // Ordenamiento de empleados por fecha de alta
-    for (Map.Entry<Dpto, Map<Genero, List<Empleado>>> entry1 : empleadoPorDptoGenero.entrySet()) {
-      Dpto clave1 = entry1.getKey();
-      Map<Genero, List<Empleado>> map = entry1.getValue();
-      for (Map.Entry<Genero, List<Empleado>> entry2 : map.entrySet()) {
-        Genero clave2 = entry2.getKey();
-        List<Empleado> empleados = entry2.getValue();
-        Collections.sort(empleados);
-        System.out.println(clave1 + " " + clave2);
-        for (Empleado empleado : empleados) {
-          System.out.println(" - " + empleado.getFechaAlta() + " " + empleado.getNombre());
-        }
-      }
-    }
-    // Funciones de agregado
-    empleadoPorDptoGenero.entrySet().forEach(
-      entry1 -> {
-        entry1.getValue().entrySet().forEach(
-          entry2 -> {
-            System.out.println(entry1.getKey() + " " + entry2.getKey());
-            entry2.getValue().stream().sorted().forEach(
-              emp -> System.out.println(" - " + emp.getFechaAlta() + " " + emp.getNombre())
-            );
-          }
-        );
-      }
+    System.out.println(pasajerosPorGeneroEdadOrdenado);
+
+    // 9. Mostrar la colección del punto 7 ordenada en orden alfabético inverso por el primer apellido, sin modificar el orden natural de la clase Pasajero.
+    System.out
+        .println(
+            "*** 9. Mostrar la colección del punto 7 ordenada en orden alfabético inverso por el primer apellido, sin modificar el orden natural de la clase Pasajero.");
+    SortedMap<Genero, SortedMap<Integer, List<Pasajero>>> pasajerosPorGeneroEdadOrdenadoInv = pasajeros
+      .stream()
+      .sorted(cmprtr.reversed())
+      .collect(
+        Collectors.groupingBy(
+          Pasajero::genero,
+          TreeMap::new,
+          Collectors.groupingBy(
+            Pasajero::edad,
+            TreeMap::new,
+            Collectors.toList()
+          )
+        )
+      );
+    System.out.println(pasajerosPorGeneroEdadOrdenadoInv);
+
+    // 10. ​Obtener una colección que almacene el nombre y el apellido de los pasajeros, agrupado por las horas de duración de su viaje.
+    System.out
+        .println(
+            "*** 10. Obtener una colección que almacene el nombre y el apellido de los pasajeros, agrupado por las horas de duración de su viaje.");
+    SortedMap<Double, List<String>> nombreApellidosPorDuración = vuelos.stream().collect(
+      Collectors.groupingBy(
+        v -> Double.valueOf(v.minutosVuelo()) / 60,
+        TreeMap::new,
+        Collectors.flatMapping(
+          v -> v.getPasajeros().stream().map(
+            p -> p.nombre() + " " + p.primerApellido() + " " + p.segundoApellido()
+          ),
+          Collectors.toList()
+        )
+      )
     );
-    // Map ordenado: TreeMap
-    Map<String, Long> mapOrdenado = new TreeMap<>();
-    mapOrdenado.putAll(m);
-    System.out.println(mapOrdenado);
-    Map<String, Long> mapOrdenadoInverso = new TreeMap<>(Comparator.reverseOrder());
-      mapOrdenadoInverso.putAll(m);
-    System.out.println(mapOrdenadoInverso);
+    System.out.println(nombreApellidosPorDuración);
+
   }
 }
