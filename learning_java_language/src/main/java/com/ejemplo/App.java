@@ -4,12 +4,12 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Month;
+import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -100,9 +100,9 @@ public class App {
     Vuelo vuelo4 = Vuelo.builder()
         .destino(Destino.BERLIN)
         .precio(new BigDecimal(150.25))
-        .fechaSalida(LocalDate.of(2026, Month.MAY, 10))
+        .fechaSalida(LocalDate.now())
         .horaSalida(LocalTime.of(13, 00))
-        .fechaLlegada(LocalDate.of(2026, Month.MAY, 10))
+        .fechaLlegada(LocalDate.now())
         .horaLlegada(LocalTime.of(14, 55))
         .numeroPlazas(3)
         .build();
@@ -124,10 +124,19 @@ public class App {
         .horaLlegada(LocalTime.of(12, 15))
         .numeroPlazas(3)
         .build();
+    Vuelo vuelo7 = Vuelo.builder()
+        .destino(Destino.NUEVA_YORK)
+        .precio(new BigDecimal(125.50))
+        .fechaSalida(LocalDate.of(2026, Month.MAY, 31))
+        .horaSalida(LocalTime.of(10, 20))
+        .fechaLlegada(LocalDate.of(2026, Month.MAY, 31))
+        .horaLlegada(LocalTime.of(12, 15))
+        .numeroPlazas(3)
+        .build();
     // Definición de listados
     List<Pasajero> pasajeros = List.of(pasajero1, pasajero2, pasajero3, pasajero4, pasajero5, pasajero6, pasajero7,
         pasajero8);
-    List<Vuelo> vuelos = List.of(vuelo1, vuelo2, vuelo3, vuelo4, vuelo5, vuelo6);
+    List<Vuelo> vuelos = List.of(vuelo1, vuelo2, vuelo3, vuelo4, vuelo5, vuelo6, vuelo7);
     System.out.println(pasajeros.size());
     // System.out.println(vuelos);
     // vuelos.stream().map(Vuelo::minutosVuelo).forEach(System.out::println);
@@ -142,6 +151,7 @@ public class App {
     vuelo2.incluirPasajero(pasajero4);
     vuelo3.incluirPasajero(pasajero5);
     vuelo4.incluirPasajero(pasajero6);
+    vuelo7.incluirPasajero(pasajero1);
     // vuelos.stream().map(Vuelo::plazasDisponibles).forEach(System.out::println);
     // vuelos.stream().forEach(Vuelo::descripcion);
     // vuelos.stream().map(p -> p.esPasajeroVuelo(pasajero1)).forEach(System.out::println);
@@ -166,7 +176,7 @@ public class App {
     // Vuelos con más pasajeros: SOLUCIÓN 2
     System.out.println("*** Vuelos con más pasajeros: SOLUCIÓN 2 ***");
     Map<Integer, List<Vuelo>> pasajerosVuelo1 = vuelos.stream().collect(
-        Collectors.groupingBy(v -> v.getPasajeros().size()));
+      Collectors.groupingBy(v -> v.getPasajeros().size()));
     SortedMap<Integer, List<Vuelo>> pasajerosVueloInverso = new TreeMap<>(Comparator.reverseOrder());
     pasajerosVueloInverso.putAll(pasajerosVuelo1);
     int mayor1 = pasajerosVueloInverso.firstKey();
@@ -201,16 +211,29 @@ public class App {
 
     // Vuelos con más pasajeros: SOLUCIÓN 5
     System.out.println("*** Vuelos con más pasajeros: SOLUCIÓN 5 ***");
-    Optional<Vuelo> a = vuelos.stream().collect(
-        Collectors.maxBy(Comparator.comparingInt(v -> v.getPasajeros().size()))
-    );
-    System.out.println("Índice: " + a.get().getPasajeros().size());
+    Vuelo vueloMasPasajeros = vuelos.stream().collect(
+      Collectors.maxBy(Comparator.comparingInt(v -> v.getPasajeros().size()))
+    ).get();
+    System.out.println("Número pasajeros: " + vueloMasPasajeros.getPasajeros().size());
+    System.out.println("Pasajeros del vuelo: " + vueloMasPasajeros.getPasajeros());
 
-    System.exit(0);
+    // Vuelos con más pasajeros: SOLUCIÓN 6
+    System.out.println("*** Vuelos con más pasajeros: SOLUCIÓN 6 ***");
+    vuelos.stream().mapToInt(v -> v.getPasajeros().size()).max().ifPresent(System.out::println);
+
+    // Vuelos con más pasajeros: SOLUCIÓN 7
+    System.out.println("*** Vuelos con más pasajeros: SOLUCIÓN 7 ***");
+    vuelos.stream().max(
+      (v1, v2) -> Integer.valueOf(v1.getPasajeros().size()).compareTo(v2.getPasajeros().size())
+    ).ifPresent(System.out::println);
+
+    // Recuperar y mostrar el vuelo con el menor precio
+    System.out.println("*** Recuperar y mostrar el vuelo con el menor precio");
+    vuelos.stream().min(Comparator.comparing(Vuelo::getPrecio)).ifPresent(System.out::println);
 
     // 1. Obtener un listado de los vuelos que tienen el número de plazas completo.
     System.out.println("*** 1. Obtener un listado de los vuelos que tienen el número de plazas completo.");
-    vuelos.stream().filter(v -> v.plazasDisponibles() == 0).forEach(System.out::println);
+    vuelos.stream().filter(v -> v.getNumeroPlazas() == v.getPasajeros().size()).forEach(System.out::println);
 
     // 2. Obtener un listado de los vuelos que tienen fecha de salida prevista para el día de hoy.
     System.out
@@ -231,14 +254,25 @@ public class App {
     System.out
         .println(
             "*** 5. Obtener una colección que almacene un listado de pasajeros agrupado por el destino del vuelo.");
-    Map<Destino, Set<Pasajero>> pasajerosPorDestino = vuelos.stream().collect(
+    Map<Destino, List<Pasajero>> pasajerosPorDestino1 = vuelos.stream().collect(
       Collectors.groupingBy(
           Vuelo::getDestino,
-          Collectors.flatMapping(v -> v.getPasajeros().stream(), Collectors.toSet()
+          Collectors.flatMapping(v -> v.getPasajeros().stream(), Collectors.toList()
         )
       )
     );
-    pasajerosPorDestino.entrySet().forEach(System.out::println);
+    pasajerosPorDestino1.entrySet().forEach(System.out::println);
+    Map<Destino, List<Pasajero>> pasajerosPorDestino2 = vuelos.stream().collect(
+      Collectors.toMap(
+        Vuelo::getDestino,
+        v -> (ArrayList<Pasajero>) v.getPasajeros(),
+        (v1, v2) -> {
+          v1.addAll(v2);
+          return v1;
+        }
+      )
+    );
+    pasajerosPorDestino2.entrySet().forEach(System.out::println);
 
     // 6.​ Crear una colección que almacene los vuelos que están programados para salir en los últimos 10 días del mes en curso.
     System.out
@@ -259,7 +293,7 @@ public class App {
           )
         );
     System.out.println(vuelosUltimosDias);
-
+    
     // 7. Crear una colección que almacene los pasajeros, por el genero y la edad del pasajero.
     System.out
         .println(
@@ -284,7 +318,7 @@ public class App {
     System.out
         .println(
             "*** 8. Mostrar la colección anterior ordenada por el nombre y los apellidos de los pasajeros en orden natural.");
-    Comparator<Pasajero> cmprtr = (Pasajero p1, Pasajero p2) -> {
+    Comparator<Pasajero> cmprtr = (p1, p2) -> {
       int i1 = p1.nombre().compareTo(p2.nombre());
       int i2 = p1.primerApellido().compareTo(p2.primerApellido());
       return i1 == 0 ? i2 : i1;
@@ -313,7 +347,7 @@ public class App {
     SortedMap<Genero, SortedMap<Integer, List<Pasajero>>> pasajerosPorGeneroEdadOrdenadoInv = vuelos
       .stream()
       .flatMap(v -> v.getPasajeros().stream())
-      .sorted(cmprtr.reversed())
+      .sorted(Comparator.reverseOrder())
       .collect(
         Collectors.groupingBy(
           Pasajero::genero,
@@ -331,9 +365,12 @@ public class App {
     System.out
         .println(
             "*** 10. Obtener una colección que almacene el nombre y el apellido de los pasajeros, agrupado por las horas de duración de su viaje.");
-    SortedMap<Double, List<Map<String, String>>> nombreApellidosPorDuración = vuelos.stream().collect(
+    SortedMap<Long, Set<Map<String, String>>> nombreApellidosPorDuración = vuelos.stream().collect(
       Collectors.groupingBy(
-        v -> Double.valueOf(v.minutosVuelo()) / 60,
+        v -> ChronoUnit.HOURS.between(
+              v.getFechaSalida().atTime(v.getHoraSalida()),
+              v.getFechaLlegada().atTime(v.getHoraLlegada())
+            ),
         TreeMap::new,
         Collectors.flatMapping(
           v -> v.getPasajeros().stream().map(
@@ -343,11 +380,13 @@ public class App {
               "segundoApellido", p.segundoApellido()
             )
           ),
-          Collectors.toList()
+          Collectors.toSet()
         )
       )
     );
     System.out.println(nombreApellidosPorDuración);
+
+    //System.exit(0);
 
   }
 }
