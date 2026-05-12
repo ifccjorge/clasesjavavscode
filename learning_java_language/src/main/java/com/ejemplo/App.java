@@ -1,5 +1,6 @@
 package com.ejemplo;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Month;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -70,7 +72,7 @@ public class App {
     // Definición de vuelos
     Vuelo vuelo1 = Vuelo.builder()
         .destino(Destino.NUEVA_YORK)
-        .precio(750.50)
+        .precio(new BigDecimal(750.25))
         .fechaSalida(LocalDate.of(2026, Month.JULY, 1))
         .horaSalida(LocalTime.of(12, 30))
         .fechaLlegada(LocalDate.of(2026, Month.JULY, 1))
@@ -79,7 +81,7 @@ public class App {
         .build();
     Vuelo vuelo2 = Vuelo.builder()
         .destino(Destino.TOKIO)
-        .precio(850.50)
+        .precio(new BigDecimal(850.75))
         .fechaSalida(LocalDate.of(2026, Month.JUNE, 8))
         .horaSalida(LocalTime.of(9, 20))
         .fechaLlegada(LocalDate.of(2026, Month.JUNE, 8))
@@ -88,7 +90,7 @@ public class App {
         .build();
     Vuelo vuelo3 = Vuelo.builder()
         .destino(Destino.BARCELONA)
-        .precio(95.50)
+        .precio(new BigDecimal(95.50))
         .fechaSalida(LocalDate.of(2026, Month.MAY, 30))
         .horaSalida(LocalTime.of(23, 45))
         .fechaLlegada(LocalDate.of(2026, Month.MAY, 31))
@@ -97,7 +99,7 @@ public class App {
         .build();
     Vuelo vuelo4 = Vuelo.builder()
         .destino(Destino.BERLIN)
-        .precio(150.50)
+        .precio(new BigDecimal(150.25))
         .fechaSalida(LocalDate.of(2026, Month.MAY, 10))
         .horaSalida(LocalTime.of(13, 00))
         .fechaLlegada(LocalDate.of(2026, Month.MAY, 10))
@@ -106,7 +108,7 @@ public class App {
         .build();
     Vuelo vuelo5 = Vuelo.builder()
         .destino(Destino.BUENOS_AIRES)
-        .precio(550.50)
+        .precio(new BigDecimal(550.75))
         .fechaSalida(LocalDate.of(2026, Month.MAY, 22))
         .horaSalida(LocalTime.of(21, 00))
         .fechaLlegada(LocalDate.of(2026, Month.MAY, 23))
@@ -115,7 +117,7 @@ public class App {
         .build();
     Vuelo vuelo6 = Vuelo.builder()
         .destino(Destino.PRAGA)
-        .precio(125.50)
+        .precio(new BigDecimal(125.50))
         .fechaSalida(LocalDate.of(2026, Month.MAY, 31))
         .horaSalida(LocalTime.of(10, 20))
         .fechaLlegada(LocalDate.of(2026, Month.MAY, 31))
@@ -126,7 +128,7 @@ public class App {
     List<Pasajero> pasajeros = List.of(pasajero1, pasajero2, pasajero3, pasajero4, pasajero5, pasajero6, pasajero7,
         pasajero8);
     List<Vuelo> vuelos = List.of(vuelo1, vuelo2, vuelo3, vuelo4, vuelo5, vuelo6);
-    // System.out.println(pasajeros);
+    System.out.println(pasajeros.size());
     // System.out.println(vuelos);
     // vuelos.stream().map(Vuelo::minutosVuelo).forEach(System.out::println);
 
@@ -181,9 +183,10 @@ public class App {
     );
     int mayor2 = pasajerosVuelo2.lastKey();
     System.out.println("Para " + mayor2 + " hay " + pasajerosVueloInverso.get(mayor2));
+
     // Vuelos con más pasajeros: SOLUCIÓN 4
     System.out.println("*** Vuelos con más pasajeros: SOLUCIÓN 4 ***");
-    SortedMap<Integer, List<Vuelo>> col = vuelos.stream().collect(
+    SortedMap<Integer, List<Vuelo>> pasajerosVuelo3 = vuelos.stream().collect(
       Collectors.toMap(
         v -> v.getPasajeros().size(),
         b -> new ArrayList<Vuelo>(List.of(b)),
@@ -194,7 +197,16 @@ public class App {
         TreeMap::new
       )
     );
-    System.out.println(col.lastKey());
+    System.out.println("Última clave: " + pasajerosVuelo3.lastKey());
+
+    // Vuelos con más pasajeros: SOLUCIÓN 5
+    System.out.println("*** Vuelos con más pasajeros: SOLUCIÓN 5 ***");
+    Optional<Vuelo> a = vuelos.stream().collect(
+        Collectors.maxBy(Comparator.comparingInt(v -> v.getPasajeros().size()))
+    );
+    System.out.println("Índice: " + a.get().getPasajeros().size());
+
+    System.exit(0);
 
     // 1. Obtener un listado de los vuelos que tienen el número de plazas completo.
     System.out.println("*** 1. Obtener un listado de los vuelos que tienen el número de plazas completo.");
@@ -220,9 +232,12 @@ public class App {
         .println(
             "*** 5. Obtener una colección que almacene un listado de pasajeros agrupado por el destino del vuelo.");
     Map<Destino, Set<Pasajero>> pasajerosPorDestino = vuelos.stream().collect(
-        Collectors.groupingBy(
-            Vuelo::getDestino,
-            Collectors.flatMapping(v -> v.getPasajeros().stream(), Collectors.toSet())));
+      Collectors.groupingBy(
+          Vuelo::getDestino,
+          Collectors.flatMapping(v -> v.getPasajeros().stream(), Collectors.toSet()
+        )
+      )
+    );
     pasajerosPorDestino.entrySet().forEach(System.out::println);
 
     // 6.​ Crear una colección que almacene los vuelos que están programados para salir en los últimos 10 días del mes en curso.
@@ -232,34 +247,37 @@ public class App {
     LocalDate ultimoDiaMesActual = LocalDate.now().with(TemporalAdjusters.lastDayOfMonth());
     LocalDate fechaAnterior = ultimoDiaMesActual.minusDays(10);
     SortedMap<LocalDate, List<Vuelo>> vuelosUltimosDias = vuelos.stream().filter(
-        v -> {
-          LocalDate fecha = v.getFechaSalida();
-          return fecha.isEqual(ultimoDiaMesActual) || fecha.isBefore(ultimoDiaMesActual) && fecha.isAfter(
-              fechaAnterior);
-        }).collect(
-            Collectors.groupingBy(
-                Vuelo::getFechaSalida,
-                TreeMap::new,
-                Collectors.toList()
-            )
-          );
+      v -> {
+        LocalDate fecha = v.getFechaSalida();
+        return fecha.isEqual(ultimoDiaMesActual) || fecha.isBefore(ultimoDiaMesActual) && fecha.isAfter(
+            fechaAnterior);
+      }).collect(
+          Collectors.groupingBy(
+            Vuelo::getFechaSalida,
+            TreeMap::new,
+            Collectors.toList()
+          )
+        );
     System.out.println(vuelosUltimosDias);
 
     // 7. Crear una colección que almacene los pasajeros, por el genero y la edad del pasajero.
     System.out
         .println(
             "*** 7. Crear una colección que almacene los pasajeros, por el genero y la edad del pasajero.");
-    SortedMap<Genero, SortedMap<Integer, List<Pasajero>>> pasajerosPorGeneroEdad = pasajeros.stream().collect(
-      Collectors.groupingBy(
-        Pasajero::genero,
-        TreeMap::new,
+    SortedMap<Genero, SortedMap<Integer, List<Pasajero>>> pasajerosPorGeneroEdad = vuelos
+      .stream()
+      .flatMap(v -> v.getPasajeros().stream())
+      .collect(
         Collectors.groupingBy(
-          Pasajero::edad,
+          Pasajero::genero,
           TreeMap::new,
-          Collectors.toList()
+          Collectors.groupingBy(
+            Pasajero::edad,
+            TreeMap::new,
+            Collectors.toList()
+          )
         )
-      )
-    );
+      );
     System.out.println(pasajerosPorGeneroEdad);
 
     // 8. Mostrar la colección anterior ordenada por el nombre y los apellidos de los pasajeros en orden natural.
@@ -271,8 +289,9 @@ public class App {
       int i2 = p1.primerApellido().compareTo(p2.primerApellido());
       return i1 == 0 ? i2 : i1;
     };
-    SortedMap<Genero, SortedMap<Integer, List<Pasajero>>> pasajerosPorGeneroEdadOrdenado = pasajeros
+    SortedMap<Genero, SortedMap<Integer, List<Pasajero>>> pasajerosPorGeneroEdadOrdenado = vuelos
       .stream()
+      .flatMap(v -> v.getPasajeros().stream())
       .sorted(cmprtr)
       .collect(
         Collectors.groupingBy(
@@ -291,8 +310,9 @@ public class App {
     System.out
         .println(
             "*** 9. Mostrar la colección del punto 7 ordenada en orden alfabético inverso por el primer apellido, sin modificar el orden natural de la clase Pasajero.");
-    SortedMap<Genero, SortedMap<Integer, List<Pasajero>>> pasajerosPorGeneroEdadOrdenadoInv = pasajeros
+    SortedMap<Genero, SortedMap<Integer, List<Pasajero>>> pasajerosPorGeneroEdadOrdenadoInv = vuelos
       .stream()
+      .flatMap(v -> v.getPasajeros().stream())
       .sorted(cmprtr.reversed())
       .collect(
         Collectors.groupingBy(
@@ -311,13 +331,17 @@ public class App {
     System.out
         .println(
             "*** 10. Obtener una colección que almacene el nombre y el apellido de los pasajeros, agrupado por las horas de duración de su viaje.");
-    SortedMap<Double, List<String>> nombreApellidosPorDuración = vuelos.stream().collect(
+    SortedMap<Double, List<Map<String, String>>> nombreApellidosPorDuración = vuelos.stream().collect(
       Collectors.groupingBy(
         v -> Double.valueOf(v.minutosVuelo()) / 60,
         TreeMap::new,
         Collectors.flatMapping(
           v -> v.getPasajeros().stream().map(
-            p -> p.nombre() + " " + p.primerApellido() + " " + p.segundoApellido()
+            p -> Map.of(
+              "nombre", p.nombre(),
+              "primerApellido", p.primerApellido(),
+              "segundoApellido", p.segundoApellido()
+            )
           ),
           Collectors.toList()
         )

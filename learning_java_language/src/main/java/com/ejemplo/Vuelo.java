@@ -1,5 +1,6 @@
 package com.ejemplo;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -24,7 +25,7 @@ import lombok.ToString;
 public class Vuelo {
 
     private Destino destino;
-    private Double precio;
+    private BigDecimal precio;
     private LocalDate fechaSalida;
     private LocalTime horaSalida;
     private LocalDate fechaLlegada;
