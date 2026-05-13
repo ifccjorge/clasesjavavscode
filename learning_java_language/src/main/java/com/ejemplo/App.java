@@ -1,7 +1,9 @@
 package com.ejemplo;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Month;
 import java.time.temporal.ChronoUnit;
@@ -151,7 +153,8 @@ public class App {
     vuelo2.incluirPasajero(pasajero4);
     vuelo3.incluirPasajero(pasajero5);
     vuelo4.incluirPasajero(pasajero6);
-    vuelo7.incluirPasajero(pasajero1);
+    vuelo5.incluirPasajero(pasajero7);
+    vuelo7.incluirPasajero(pasajero8);
     // vuelos.stream().map(Vuelo::plazasDisponibles).forEach(System.out::println);
     // vuelos.stream().forEach(Vuelo::descripcion);
     // vuelos.stream().map(p -> p.esPasajeroVuelo(pasajero1)).forEach(System.out::println);
@@ -313,6 +316,30 @@ public class App {
         )
       );
     System.out.println(pasajerosPorGeneroEdad);
+    // Otra solución
+    Map<Genero, Map<Integer, List<Pasajero>>> pasajerosPorGeneroEdad2 = vuelos
+      .stream()
+      .flatMap(v -> v.getPasajeros().stream())
+      .collect(
+        Collectors.groupingBy(
+          Pasajero::genero,
+          Collectors.groupingBy(Pasajero::edad)
+        )
+      );
+    pasajerosPorGeneroEdad2.entrySet().forEach(
+      entry1 -> {
+        Genero genero = entry1.getKey();
+        System.out.println("Del género: " + genero);
+        var valor = entry1.getValue();
+        valor.entrySet().forEach(
+          entry2 -> {
+            System.out.println("Con edad: " + entry2.getKey());
+            System.out.println("El listado de pasajeros por orden natural: ");
+            entry2.getValue().stream().sorted().forEach(System.out::println);
+          }
+        );
+      }
+    );
 
     // 8. Mostrar la colección anterior ordenada por el nombre y los apellidos de los pasajeros en orden natural.
     System.out
@@ -386,6 +413,80 @@ public class App {
     );
     System.out.println(nombreApellidosPorDuración);
 
+    // 11. Mostrar el listado de pasajeros ordenado de mayor a menor por la duración del viaje.
+    System.out
+        .println(
+            "*** 11. Mostrar el listado de pasajeros ordenado de mayor a menor por la duración del viaje.");
+    Map<Long, List<Pasajero>> pasajerosPorDuracionOrdenado = vuelos.stream()
+    .collect(
+      Collectors.groupingBy(
+        v -> ChronoUnit.HOURS.between(
+          v.getFechaSalida().atTime(v.getHoraSalida()),
+          v.getFechaLlegada().atTime(v.getHoraLlegada())
+        ),
+        Collectors.flatMapping(
+          v -> v.getPasajeros().stream(),
+          Collectors.toList()
+        )
+      )
+    );
+    System.out.println(pasajerosPorDuracionOrdenado);
+    pasajerosPorDuracionOrdenado.entrySet().forEach(
+      entry1 -> {
+          System.out.println("Duración: " + entry1.getKey() + " horas");
+          entry1.getValue().stream().sorted(Comparator.reverseOrder()).forEach(System.out::println);
+      }
+    );
+
+    // 12. Recuperar el vuelo que tiene la máxima duración y mostrar sus pasajeros agrupados por género y edad del pasajero.
+    System.out
+        .println(
+            "*** 12. Recuperar el vuelo que tiene la máxima duración y mostrar sus pasajeros agrupados por género y edad del pasajero.");
+    vuelos.stream().max(Comparator.comparing(
+      v -> ChronoUnit.HOURS.between(
+          v.getFechaSalida().atTime(v.getHoraSalida()),
+          v.getFechaLlegada().atTime(v.getHoraLlegada())
+        )
+    )).ifPresent(
+      v -> System.out.println(v.getPasajeros().stream().collect(
+          Collectors.groupingBy(
+            Pasajero::genero,
+            Collectors.groupingBy(Pasajero::edad)
+          )
+        )
+      )
+    );
+
+    // 13. Enviar un mensaje a los pasajeros cuyo vuelo saldrá en las próximas 3
+    // horas.
+    System.out
+        .println(
+            "*** 13. Enviar un mensaje a los pasajeros cuyo vuelo saldrá en las próximas 3 horas.");
+    vuelos.stream().filter(
+      v -> Duration.between(LocalDateTime.now(), v.getFechaSalida().atTime(v.getHoraSalida())).toHours() < 3
+    ).forEach(System.out::println);
+
+    // 14. Enviar un mensaje a los pasajeros cuyo vuelo saldrá en las próximas 3
+    // días.
+    System.out
+        .println(
+            "*** 14. Enviar un mensaje a los pasajeros cuyo vuelo saldrá en las próximas 3 días.");
+    vuelos.stream().filter(
+      v -> Duration.between(LocalDateTime.now(), v.getFechaSalida().atTime(v.getHoraSalida())).toDays() < 3
+    ).forEach(System.out::println);
+
+    // 15. Crear una colección que almacene el listado de pasajeros agrupado por el día en que tiene lugar su vuelo, considerando que el vuelo tiene lugar en el mes en curso. Al mostrar la colección resultante, mostrar el nombre del día de la semana en español.
+    System.out
+        .println(
+            "*** 15. Crear una colección que almacene el listado de pasajeros agrupado por el día en que tiene lugar su vuelo, considerando que el vuelo tiene lugar en el mes en curso. Al mostrar la colección resultante, mostrar el nombre del día de la semana en español.");
+    
+    
+    // 16. Crear una colección de los vuelos que no están previstos para el mes en curso y mostrar el nombre del mes para el cual está prevista su fecha de salida, en español.
+    System.out
+        .println(
+            "*** 16. Crear una colección de los vuelos que no están previstos para el mes en curso y mostrar el nombre del mes para el cual está prevista su fecha de salida, en español.");
+    
+    
     //System.exit(0);
 
   }
