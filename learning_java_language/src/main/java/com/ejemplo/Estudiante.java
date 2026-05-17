@@ -17,8 +17,15 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @EqualsAndHashCode(callSuper = false)
 @ToString(callSuper = true)
-public class Estudiante extends Persona {
-  private String nombreFacultad;
+public class Estudiante extends Persona implements Comparable<Estudiante> {
+  private NombreFacultad nombreFacultad;
   private int totalAsignaturasMatriculadas;
   private LocalDate fechaAltaFacultad;
+
+    // Orden natural: número total de asignaturas de forma ascendente
+    @Override
+    public int compareTo(Estudiante e) {
+      return Integer.valueOf(this.totalAsignaturasMatriculadas)
+        .compareTo(e.getTotalAsignaturasMatriculadas());
+    }
 }

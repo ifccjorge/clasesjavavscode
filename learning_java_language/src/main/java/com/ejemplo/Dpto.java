@@ -1,7 +1,7 @@
 package com.ejemplo;
 
 public enum Dpto {
-  PROFESORADO,
-  CONTABILIDAD,
-  RRHH
+  DOCENCIA,
+  INVESTIGACION,
+  PRACTICAS
 }

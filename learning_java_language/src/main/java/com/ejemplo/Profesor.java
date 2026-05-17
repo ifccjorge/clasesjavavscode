@@ -17,10 +17,19 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @EqualsAndHashCode(callSuper = false)
 @ToString(callSuper = true)
-public class Profesor extends Persona {
+public class Profesor extends Persona implements Comparable<Profesor> {
   private int totalEstudiantes;
   private Dpto dpto;
   private LocalDate fechaInicioFacultad;
   private BigDecimal salario;
-  private String nombreFacultad;
+  // Nuevo atributo
+  private NombreFacultad nombreFacultad;
+  
+  // Orden natural: salario y antigüedad del profesor de forma ascendente
+  @Override
+  public int compareTo(Profesor p) {
+    int comparacionSalario = this.salario.compareTo(p.getSalario());
+    int comparacionAntiguedad = this.fechaInicioFacultad.compareTo(p.getFechaInicioFacultad());
+    return comparacionSalario != 0 ? comparacionSalario : comparacionAntiguedad;
+  }
 }

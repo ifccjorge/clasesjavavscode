@@ -18,7 +18,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode
 @ToString
 public class Facultad {
-  private String nombre;
+  private NombreFacultad nombre;
   private List<Profesor> profesores;
   private List<Estudiante> estudiantes;
 }
