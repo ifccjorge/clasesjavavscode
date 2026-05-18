@@ -9,13 +9,11 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import static java.util.function.Function.identity;
 import java.util.stream.Collectors;
 import static java.util.stream.Collectors.averagingDouble;
 import static java.util.stream.Collectors.flatMapping;
 import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
 public class App {
@@ -204,13 +202,10 @@ public class App {
     Map<Facultad, Map<Dpto, List<Profesor>>> profesoresPorFacultadYDepartamento = listaFacultades.stream()
       .collect(
         groupingBy(
-          Function.identity(),
+          identity(),
           flatMapping(
             f -> f.getProfesores().stream(),
-            groupingBy(
-              p -> p.getDpto(),
-              toList()
-            )
+            groupingBy(Profesor::getDpto)
           )
         )
       );
@@ -322,7 +317,8 @@ public class App {
         p -> (p.getFechaInicioFacultad().isAfter(fechaAnteriorDias)
               && p.getFechaInicioFacultad().isBefore(ultimoDiaMesActual)
               || p.getFechaInicioFacultad().isEqual(ultimoDiaMesActual)
-            ) && p.getSalario().compareTo(mediaSalarios) == 1)
+            ) && p.getSalario().compareTo(mediaSalarios) == 1
+      )
       .forEach(System.out::println);
 
     System.out.println("Media de salarios: " + mediaSalarios);
