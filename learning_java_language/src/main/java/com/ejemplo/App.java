@@ -10,10 +10,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import static java.util.function.Function.identity;
-import java.util.stream.Collectors;
 import static java.util.stream.Collectors.averagingDouble;
 import static java.util.stream.Collectors.flatMapping;
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.summingInt;
 import static java.util.stream.Collectors.toMap;
 
 public class App {
@@ -327,12 +327,13 @@ public class App {
     // Apartado 10: Recorrer la lista de facultades y obtener una nueva colección que agrupe por el total de asignaturas matriculadas por facultad.
     System.out.println("*** APARTADO 10 ***");
 
-    Map<Facultad, Integer> asignaturasMatriculadasFacultad = listaFacultades.stream().collect(
+    Map<Facultad, Integer> asignaturasMatriculadasFacultad = listaFacultades.stream()
+      .collect(
       groupingBy(
         identity(),
         flatMapping(
           f -> f.getEstudiantes().stream(),
-          Collectors.summingInt(Estudiante::getTotalAsignaturasMatriculadas)
+          summingInt(Estudiante::getTotalAsignaturasMatriculadas)
         )
       )
     );
@@ -340,6 +341,26 @@ public class App {
     // Comprobación
     asignaturasMatriculadasFacultad.entrySet().forEach(
       entry -> System.out.println(entry.getKey().getNombre().name() + ":" + entry.getValue())
+    );
+
+    // Solución corregida
+    Map<Integer, List<Facultad>> facultadesAsignaturasMatriculadas = listaFacultades.stream()
+      .collect(
+        groupingBy(
+          f -> f.getEstudiantes().stream()
+          .mapToInt(Estudiante::getTotalAsignaturasMatriculadas)
+          .sum()
+        )
+      );
+    
+    // Comprobación
+    facultadesAsignaturasMatriculadas.forEach(
+      (k, v) -> {
+        System.out.println(k + " asignaturas:");
+        v.forEach(
+          p -> System.out.println(p.getNombre().name())
+        );
+      }
     );
 
   }
