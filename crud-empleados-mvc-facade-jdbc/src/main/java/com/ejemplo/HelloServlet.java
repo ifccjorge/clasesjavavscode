@@ -44,6 +44,7 @@ public class HelloServlet extends HttpServlet {
     empleados.forEach(
       (clave, valor) -> out.println("<p>" + clave + ":" + valor + "</p>")
     );
-    
+    //Departamento departamento = Departamento.randomDepartamento();
+    //System.out.println(departamento);
   }
 }

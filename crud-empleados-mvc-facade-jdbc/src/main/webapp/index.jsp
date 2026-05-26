@@ -14,5 +14,10 @@ pageEncoding="UTF-8"%>
         out.println("<p>" + nombre + "</p>");
       }
     %>
+    <h1>Bienvenido al sistema de gestión de empleados</h1>
+    <p>Utilice el menú para navegar por las diferentes opciones</p>
+    <div>
+      <a href="MainController">Mostrar listado de empleados</a>
+    </div>
   </body>
 </html>
