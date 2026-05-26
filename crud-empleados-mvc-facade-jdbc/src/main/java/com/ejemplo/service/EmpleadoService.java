@@ -1,5 +1,7 @@
 package com.ejemplo.service;
 
+import java.sql.SQLException;
+
 public interface EmpleadoService {
-  public abstract boolean isConnectionOK();
+  public abstract boolean isConnectionOK() throws SQLException, Exception;
 }

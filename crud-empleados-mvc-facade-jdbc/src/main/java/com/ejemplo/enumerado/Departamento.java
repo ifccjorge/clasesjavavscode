@@ -1,4 +1,4 @@
-package com.ejemplo;
+package com.ejemplo.enumerado;
 
 import java.util.Random;
 
@@ -7,7 +7,7 @@ public enum Departamento {
 
   private static final Random PRNG = new Random();
 
-  public static Departamento randomDepartamento()  {
+  public static Departamento randomDepartamento() {
     Departamento[] directions = values();
     return directions[PRNG.nextInt(directions.length)];
   }
