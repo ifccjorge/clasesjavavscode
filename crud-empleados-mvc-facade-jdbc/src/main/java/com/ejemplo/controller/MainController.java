@@ -1,8 +1,9 @@
 package com.ejemplo.controller;
 
 import java.io.IOException;
-import java.util.logging.Logger;
+import java.util.List;
 
+import com.ejemplo.models.Empleado;
 import com.ejemplo.service.EmpleadoService;
 import com.ejemplo.service.EmpleadoServiceImpl;
 
@@ -16,7 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class MainController extends HttpServlet {
   
   private static final long serialVersionUID = 1L;
-  private static final Logger LOG = Logger.getLogger("MainController");
+  //private static final Logger LOG = Logger.getLogger("MainController");
 
   /**
    *  @see HttpServlet#HttpServlet()
@@ -33,16 +34,20 @@ public class MainController extends HttpServlet {
       throws ServletException, IOException {
     //response.getWriter().append("Served at: ").append(request.getContextPath());
     EmpleadoService empleadoService = new EmpleadoServiceImpl();
-    boolean conectionResult = false;
-    try {
-        conectionResult = empleadoService.isConnectionOK();
-      } catch (Exception ex) {
-          System.getLogger(MainController.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
-      }
-    if (conectionResult)
-      LOG.info("Conexión exitosa");
-    else
-      LOG.info("Error de conexión a la base de datos");
+    //boolean conectionResult = false;
+    //try {
+    //    conectionResult = empleadoService.isConnectionOK();
+    //  } catch (Exception ex) {
+    //      System.getLogger(MainController.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+    //  }
+    //if (conectionResult)
+    //  LOG.info("Conexión exitosa");
+    //else
+    //  LOG.info("Error de conexión a la base de datos");
+    List<Empleado> empleados = empleadoService.getEmpleadoList();
+    request.setAttribute("empleados", empleados);
+    request.getRequestDispatcher("views/listadoEmpleados.jsp").forward(request, response);
+
   }
 
   /**

@@ -2,13 +2,13 @@ package com.ejemplo.enumerado;
 
 import java.util.Random;
 
-public enum Genero {
+public enum GeneroComun {
   MASCULINO, FEMENINO;
 
   private static final Random PRNG = new Random();
 
-  public static Genero randomDepartamento()  {
-    Genero[] directions = values();
+  public static GeneroComun randomDepartamento()  {
+    GeneroComun[] directions = values();
     return directions[PRNG.nextInt(directions.length)];
   }
 }
