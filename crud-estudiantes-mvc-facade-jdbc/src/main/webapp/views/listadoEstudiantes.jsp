@@ -1,4 +1,4 @@
-<%@ page import="com.ejemplo.models.Empleado"%>
+<%@ page import="com.ejemplo.models.Estudiante"%>
 <%@ page import="java.text.NumberFormat"%>
 <%@ page import="java.time.format.DateTimeFormatter"%>
 <%@ page import="java.util.List"%>
@@ -9,7 +9,7 @@ pageEncoding="UTF-8"%>
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Listado empleados</title>
+    <title>Listado de estudiantes</title>
   </head>
   <body>
     <%
@@ -18,37 +18,36 @@ pageEncoding="UTF-8"%>
       NumberFormat numberFormat = NumberFormat.getCurrencyInstance(local);
       numberFormat.setMinimumFractionDigits(2);
       numberFormat.setMaximumFractionDigits(2);
-      List<Empleado> empleados = (List<Empleado>) request.getAttribute("empleados");
+      List<Estudiante> estudiantes = (List<Estudiante>) request.getAttribute("estudiantes");
     %>
-    <h1>Lista de empleados</h1>
+    <h1>Lista de estudiantes de la universidad</h1>
     <div>
-      <p>
-        <a href="AltaController" title="Muestra el formulario de alta/modificación de empleado">
-          Alta de Empleado
-        </a>
-      </p>
-      <table border="4" cellpadding="8" cellspacing="0">
+      <table border="8" cellpadding="16" cellspacing="0">
         <thead>
           <tr>
             <th>Nombre</th>
             <th>Primer apellido</th>
             <th>Segundo apellido</th>
-            <th>Fecha de alta</th>
             <th>Genero</th>
-            <th>Salario</th>
+            <th>Total asignatura</th>
+            <th>Fecha de nacimiento</th>
+            <th>Beca concedida</th>
+            <th>Universidad</th>
           </tr>
         </thead>
         <tbody>
           <%
-            for (Empleado empleado : empleados) {
+            for (Estudiante estudiante : estudiantes) {
               %>
               <tr>
-                <td><%=empleado.nombre()%></td>
-                <td><%=empleado.primerApellido()%></td>
-                <td><%=empleado.segundoApellido()%></td>
-                <td><%=empleado.fechaAlta().format(formatters)%></td>
-                <td><%=empleado.genero().name()%></td>
-                <td><%=numberFormat.format(empleado.salario())%></td>
+                <td><%=estudiante.nombre()%></td>
+                <td><%=estudiante.primerApellido()%></td>
+                <td><%=estudiante.segundoApellido()%></td>
+                <td><%=estudiante.genero().name()%></td>
+                <td><%=estudiante.totalAsignaturas()%></td>
+                <td><%=estudiante.fechaNacimiento().format(formatters)%></td>
+                <td><%=numberFormat.format(estudiante.becaConcedida())%></td>
+                <td><%=estudiante.universidades_id()%></td>
               </tr>
               <%
             }
@@ -57,7 +56,7 @@ pageEncoding="UTF-8"%>
       </table>      
     </div>
     <div>
-      <p><a href="/crud-empleados-mvc-facade-jdbc">Volver al menú principal</a></p>
+      <p><a href="/crud-estudiantes-mvc-facade-jdbc">Volver al menú principal</a></p>
     </div>
   </body>
 </html>
