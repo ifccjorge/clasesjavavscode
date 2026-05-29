@@ -30,8 +30,9 @@ public class EmpleadoServiceImpl implements EmpleadoService {
   @Override
   public List<Empleado> getEmpleadoList() {
     List<Empleado> empleados = new ArrayList<>();
-    try (DBConexion dbConexion = new DBConexion("cursom", "Temp2026$$");
-        Connection connection = dbConexion.getConexion();
+    try (
+      DBConexion dbConexion = new DBConexion("cursom", "Temp2026$$");
+      Connection connection = dbConexion.getConexion();
     ) {
       ResultSet rs = dbConexion.getEmpleados(connection);
       while (rs.next()) {

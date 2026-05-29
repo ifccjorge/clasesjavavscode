@@ -5,8 +5,11 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
+
+import com.ejemplo.models.Empleado;
 
 public class DBConexion implements AutoCloseable {
   private final String user;
@@ -48,8 +51,32 @@ public class DBConexion implements AutoCloseable {
         stmt = connection.createStatement();
         rs = stmt.executeQuery(query);
       } catch (SQLException ex) {
-          System.getLogger(DBConexion.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        System.getLogger(DBConexion.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
       }
       return rs;
+    }
+
+    public ResultSet getDepartamentos(Connection connection) {
+      ResultSet rs = null;
+      String query = "SELECT * FROM departamentos ORDER BY nombre";
+      Statement stmt;
+      try {
+        stmt = connection.createStatement();
+        rs = stmt.executeQuery(query);
+      } catch (SQLException ex) {
+        System.getLogger(DBConexion.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+      }
+      return rs;
+    }
+
+    @SuppressWarnings("unused")
+    public void altaEmpleado(
+      Empleado empleado,
+      List<String> dirCorreo,
+      List<String> numTelefonos
+    ) {
+      String query1;
+      String query2;
+      String query3;
     }
 }
