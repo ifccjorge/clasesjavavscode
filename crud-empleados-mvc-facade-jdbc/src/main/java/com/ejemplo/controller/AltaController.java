@@ -2,6 +2,7 @@ package com.ejemplo.controller;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -13,6 +14,8 @@ import com.ejemplo.models.Empleado;
 import com.ejemplo.models.Genero;
 import com.ejemplo.service.DepartamentoService;
 import com.ejemplo.service.DepartamentoServiceImpl;
+import com.ejemplo.service.EmpleadoService;
+import com.ejemplo.service.EmpleadoServiceImpl;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -71,12 +74,14 @@ public class AltaController extends HttpServlet {
     LOG.log(Level.INFO, "Genero: {0}", genero);
     LOG.log(Level.INFO, "Salario: {0}", salario);
     LOG.log(Level.INFO, "Departamento: {0}", departamentos_id);
+    List<String> direccionesCorreo = null;
     if (correos != null) {
-      List<String> direccionesCorreo = Arrays.asList(correos.split(";"));
+      direccionesCorreo = Arrays.asList(correos.split(";"));
       LOG.log(Level.INFO, "Correos: {0}", direccionesCorreo);
     }
+    List<String> numerosTelefono = null;
     if (telefonos != null) {
-      List<String> numerosTelefono = Arrays.asList(telefonos.split(";"));
+      numerosTelefono = Arrays.asList(telefonos.split(";"));
       LOG.log(Level.INFO, "Teléfonos: {0}", numerosTelefono);
     }
     Empleado empleado = Empleado.builder()
@@ -87,7 +92,18 @@ public class AltaController extends HttpServlet {
       .genero(genero)
       .salario(salario)
       .departamentos_id(departamentos_id)
-        .build();
+      .build();
     LOG.log(Level.INFO, "EMPLEADO: {0}", empleado);
+    EmpleadoService empleadoService = new EmpleadoServiceImpl();
+    
+    try {
+        empleadoService.altaEmpleado(empleado, direccionesCorreo, numerosTelefono);
+    } catch (SQLException ex) {
+        System.getLogger(AltaController.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+    }
+
+    List<Empleado> empleados = empleadoService.getEmpleadoList();
+    request.setAttribute("empleados", empleados);
+    request.getRequestDispatcher("views/listadoEmpleados.jsp").forward(request, response);
   }
 }

@@ -17,14 +17,15 @@ public class EmpleadoServiceImpl implements EmpleadoService {
 
     boolean conectionOK = false;
 
-    try (DBConexion dbConexion = new DBConexion("cursom", "Temp2026$$");
-            Connection conn = dbConexion.getConexion();
+    try (
+      DBConexion dbConexion = new DBConexion("cursom", "Temp2026$$");
+      Connection conn = dbConexion.getConexion();
     ) {
         if (conn != null) conectionOK = true;
     } catch (SQLException | ClassNotFoundException ex) {
         System.getLogger(EmpleadoServiceImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
     }
-      return conectionOK;
+    return conectionOK;
   }
 
   @Override
@@ -54,6 +55,18 @@ public class EmpleadoServiceImpl implements EmpleadoService {
     }
     
     return empleados;
+  }
+
+  @Override
+  public void altaEmpleado(Empleado empleado, List<String> emails, List<String> telefonos) throws SQLException {
+    try (
+        DBConexion dbConexion = new DBConexion("cursom", "Temp2026$$");
+        Connection connection = dbConexion.getConexion();
+    ) {
+      dbConexion.altaEmpleado(connection, empleado, emails, telefonos);
+    } catch (Exception ex) {
+      System.getLogger(EmpleadoServiceImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+    }
   }
 
 }
