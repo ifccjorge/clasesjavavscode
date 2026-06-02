@@ -22,7 +22,12 @@ pageEncoding="UTF-8"%>
     %>
     <h1>Lista de estudiantes de la universidad</h1>
     <div>
-      <table border="8" cellpadding="16" cellspacing="0">
+      <p>
+        <a href="altaestudiante" title="Muestra el formulario de alta/modificación de estudiantes">
+          Alta de un estudiante
+        </a>
+      </p>
+      <table border="3" cellpadding="6" cellspacing="0">
         <thead>
           <tr>
             <th>Nombre</th>
