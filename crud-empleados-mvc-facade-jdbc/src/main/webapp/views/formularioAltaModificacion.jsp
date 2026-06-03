@@ -88,22 +88,24 @@ pageEncoding="UTF-8"%>
           </select>
         </div>
         <div>
-          <label for="correos">Correos:</label>
-          <input
-            type="text"
-            id="correos"
-            name="correos"
-            placeholder="uno o varios separados por punto y coma, por favor"
-          />
-        </div>
-        <div>
-          <label for="telefonos">Teléfonos:</label>
-          <input
-            type="text"
-            id="telefonos"
-            name="telefonos"
-            placeholder="uno o varios separados por punto y coma, por favor"
-          />
+          <p>
+            <label for="correos">Correos:</label><br/>
+            <textarea
+              rows="5"
+              cols="40"
+              id="correos"
+              name="correos"
+              placeholder="uno o varios separados por punto y coma, por favor"></textarea>
+          </p>
+          <p>
+            <label for="telefonos">Teléfonos:</label><br/>
+            <textarea
+              rows="5"
+              cols="40"
+              id="telefonos"
+              name="telefonos"
+              placeholder="uno o varios separados por punto y coma, por favor"></textarea>
+          </p>
         </div>
         <input type="submit" value="Enviar" />
       </form>

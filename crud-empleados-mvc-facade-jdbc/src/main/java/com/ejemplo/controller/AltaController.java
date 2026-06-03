@@ -28,6 +28,7 @@ public class AltaController extends HttpServlet {
   
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = Logger.getLogger("AltaController");
+  private static final String SEPARADOR = "\n";
 
   /**
    *  @see HttpServlet#HttpServlet()
@@ -57,6 +58,7 @@ public class AltaController extends HttpServlet {
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
     
+    // Recepción de parámetros
     String nombre = request.getParameter("nombre");
     String primerApellido = request.getParameter("primerApellido");
     String segundoApellido = request.getParameter("segundoApellido") == null ? "" : request
@@ -76,12 +78,12 @@ public class AltaController extends HttpServlet {
     LOG.log(Level.INFO, "Departamento: {0}", departamentos_id);
     List<String> direccionesCorreo = null;
     if (correos != null) {
-      direccionesCorreo = Arrays.asList(correos.split(";"));
+      direccionesCorreo = Arrays.asList(correos.split(SEPARADOR));
       LOG.log(Level.INFO, "Correos: {0}", direccionesCorreo);
     }
     List<String> numerosTelefono = null;
     if (telefonos != null) {
-      numerosTelefono = Arrays.asList(telefonos.split(";"));
+      numerosTelefono = Arrays.asList(telefonos.split(SEPARADOR));
       LOG.log(Level.INFO, "Teléfonos: {0}", numerosTelefono);
     }
     Empleado empleado = Empleado.builder()
@@ -94,8 +96,8 @@ public class AltaController extends HttpServlet {
       .departamentos_id(departamentos_id)
       .build();
     LOG.log(Level.INFO, "EMPLEADO: {0}", empleado);
-    EmpleadoService empleadoService = new EmpleadoServiceImpl();
     
+    EmpleadoService empleadoService = new EmpleadoServiceImpl();
     try {
         empleadoService.altaEmpleado(empleado, direccionesCorreo, numerosTelefono);
     } catch (SQLException ex) {

@@ -36,6 +36,7 @@ pageEncoding="UTF-8"%>
             <th>Fecha de alta</th>
             <th>Genero</th>
             <th>Salario</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -49,6 +50,7 @@ pageEncoding="UTF-8"%>
                 <td><%=empleado.fechaAlta().format(formatters)%></td>
                 <td><%=empleado.genero().name()%></td>
                 <td><%=numberFormat.format(empleado.salario())%></td>
+                <td><a href="DetallesController?idEmpleado=<%=empleado.id()%>">Detalles</a></td>
               </tr>
               <%
             }

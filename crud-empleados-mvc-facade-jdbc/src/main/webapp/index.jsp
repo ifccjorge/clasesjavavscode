@@ -15,8 +15,16 @@ pageEncoding="UTF-8"%>
     <h1>Bienvenido al sistema de gestión de empleados</h1>
     <p>Utilice el menú para navegar por las diferentes opciones</p>
     <div>
-      <a href="MainController">Mostrar listado de empleados</a>
+      <p>
+        <a href="MainController">Mostrar listado de empleados</a>
+      </p>
+      <p>
+        <a href="AltaController" title="Muestra el formulario de alta/modificación de empleado">
+          Alta de un nuevo empleado
+        </a>
+      </p>
     </div>
+    <p></p>
     <div>
       <h2 style="color: green; background-color: silver">
         <%= "Conexión a base de datos" %>

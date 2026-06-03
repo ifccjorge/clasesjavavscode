@@ -71,7 +71,7 @@ public class DBConexion implements AutoCloseable {
       return rs;
     }
 
-    public void altaEmpleado(
+    public void altaNuevoEmpleado(
       Connection connection,
       Empleado empleado,
       List<String> dirCorreos,
@@ -84,7 +84,8 @@ public class DBConexion implements AutoCloseable {
         // Transacción
         connection.setAutoCommit(false);
         // Insertar empleados
-        PreparedStatement psInsertEmpleado = connection.prepareStatement(queryInsertEmpleado, Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement psInsertEmpleado = connection.prepareStatement(queryInsertEmpleado,
+            Statement.RETURN_GENERATED_KEYS);
         psInsertEmpleado.setString(1, empleado.nombre());
         psInsertEmpleado.setString(2, empleado.primerApellido());
         psInsertEmpleado.setString(3, empleado.segundoApellido());
@@ -119,16 +120,32 @@ public class DBConexion implements AutoCloseable {
             }
             psInsertTelefono.executeBatch();
           }
-        connection.commit();
+          connection.commit();
         }
       } catch (SQLException ex) {
-          System.getLogger(DBConexion.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        System.getLogger(DBConexion.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
       } finally {
-          try {
-            connection.setAutoCommit(true);
-          } catch (SQLException ex) {
-            System.getLogger(DBConexion.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
-          }
+        try {
+          connection.setAutoCommit(true);
+        } catch (SQLException ex) {
+          System.getLogger(DBConexion.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        }
       }
+    }
+    
+    public ResultSet getDetallesEmpleados(
+      Connection connection,
+      int id
+    ) {
+      ResultSet rs = null;
+      String query = "SELECT dep.nombre nombreDpto, tel.telefono numeroTelefono, cor.email email FROM empleados emp INNER JOIN departamentos dep ON emp.departamentos_id = dep.id LEFT OUTER JOIN telefonos tel ON emp.id = tel.empleados_id LEFT OUTER JOIN correos cor ON emp.id = cor.empleados_id WHERE emp.id = ?";
+      try {
+          PreparedStatement psDetallesEmpleados = connection.prepareStatement(query);
+          psDetallesEmpleados.setInt(1, id);
+          rs = psDetallesEmpleados.executeQuery();
+      } catch (SQLException ex) {
+          System.getLogger(DBConexion.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+      }
+      return rs;
     }
 }

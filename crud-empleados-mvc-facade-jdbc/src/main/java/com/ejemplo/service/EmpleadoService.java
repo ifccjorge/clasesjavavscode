@@ -3,6 +3,7 @@ package com.ejemplo.service;
 import java.sql.SQLException;
 import java.util.List;
 
+import com.ejemplo.models.Detalle;
 import com.ejemplo.models.Empleado;
 
 public interface EmpleadoService {
@@ -13,4 +14,5 @@ public interface EmpleadoService {
     List<String> emails,
     List<String> telefonos
   ) throws SQLException;
+  public abstract Detalle getDetalles(int idEmpleado);
 }
