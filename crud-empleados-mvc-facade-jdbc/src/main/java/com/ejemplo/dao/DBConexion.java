@@ -140,7 +140,11 @@ public class DBConexion implements AutoCloseable {
       ResultSet rs = null;
       String query = "SELECT dep.nombre nombreDpto, tel.telefono numeroTelefono, cor.email email FROM empleados emp INNER JOIN departamentos dep ON emp.departamentos_id = dep.id LEFT OUTER JOIN telefonos tel ON emp.id = tel.empleados_id LEFT OUTER JOIN correos cor ON emp.id = cor.empleados_id WHERE emp.id = ?";
       try {
-          PreparedStatement psDetallesEmpleados = connection.prepareStatement(query);
+        PreparedStatement psDetallesEmpleados = connection.prepareStatement(
+          query,
+          ResultSet.TYPE_SCROLL_INSENSITIVE,
+          ResultSet.CONCUR_UPDATABLE
+        );
           psDetallesEmpleados.setInt(1, id);
           rs = psDetallesEmpleados.executeQuery();
       } catch (SQLException ex) {

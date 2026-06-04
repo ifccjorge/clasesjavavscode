@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.ejemplo.dao.DBConexion;
 import com.ejemplo.models.Detalle;
@@ -14,7 +16,7 @@ import com.ejemplo.models.Empleado;
 import com.ejemplo.models.Genero;
 
 public class EmpleadoServiceImpl implements EmpleadoService {
-  //private static final Logger LOG = Logger.getLogger("EmpleadoServiceImpl");
+  private static final Logger LOG = Logger.getLogger("EmpleadoServiceImpl");
 
   @Override
   public boolean isConnectionOK() throws SQLException, Exception {
@@ -79,22 +81,26 @@ public class EmpleadoServiceImpl implements EmpleadoService {
       try (
           DBConexion dbConexion = new DBConexion("cursom", "Temp2026$$");
           Connection connection = dbConexion.getConexion();
+          ResultSet rs = dbConexion.getDetallesEmpleados(connection, idEmpleado);
       ) {
-        ResultSet rs = dbConexion.getDetallesEmpleados(connection, idEmpleado);
         String nombreDpto = null;
         Set<String> numerosTelefono = new HashSet<>();
         Set<String> emails = new HashSet<>();
+        rs.beforeFirst();
+        if (rs.first()) nombreDpto = rs.getString("nombreDpto");
+        rs.beforeFirst();
         while (rs.next()) {
-          if (nombreDpto == null)
-            nombreDpto = rs.getString("nombreDpto");
           numerosTelefono.add(rs.getString("numeroTelefono"));
           emails.add(rs.getString("email"));
         }
-        Detalle.builder()
+        rs.close();
+        // Detalle del empleado
+        detalle = Detalle.builder()
           .nombreDpto(nombreDpto)
           .telefonos(numerosTelefono)
           .correos(emails)
           .build();
+        LOG.log(Level.INFO, "Detalle: {0}", detalle);
       } catch (Exception ex) {
         System.getLogger(EmpleadoServiceImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
       }

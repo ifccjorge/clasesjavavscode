@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.ejemplo.models.Detalle;
+import com.ejemplo.models.Empleado;
 import com.ejemplo.service.EmpleadoService;
 import com.ejemplo.service.EmpleadoServiceImpl;
 
@@ -39,16 +40,16 @@ public class DetallesController extends HttpServlet {
     // Capa de servicio
     EmpleadoService empleadoService = new EmpleadoServiceImpl();
     Detalle detalle = null;
+    Empleado empleado = null;
     try {
-        detalle = empleadoService.getDetalles(idEmpleado);
+      detalle = empleadoService.getDetalles(idEmpleado);
+      empleado = empleadoService.getEmpleadoList().stream().filter(e -> e.id() == idEmpleado).toList().getFirst();
     } catch (Exception ex) {
         System.getLogger(MainController.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
     }
-    //if (conectionResult)
-    //  LOG.info("Conexión exitosa");
-    //else
-    //  LOG.info("Error de conexión a la base de datos");
+
     request.setAttribute("detalle", detalle);
+    request.setAttribute("empleado", empleado);
     request.getRequestDispatcher("views/detalleEmpleado.jsp").forward(request, response);
 
   }
