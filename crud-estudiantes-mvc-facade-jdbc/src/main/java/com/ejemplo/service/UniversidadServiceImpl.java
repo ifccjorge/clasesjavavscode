@@ -17,7 +17,7 @@ public class UniversidadServiceImpl implements UniversidadService {
         BaseDatosConexion dbConexion = new BaseDatosConexion("cursom", "Temp2026$$");
         Connection conn = dbConexion.getConexion();
     ) {
-      ResultSet rs = dbConexion.getUniversidades(conn);
+      ResultSet rs = dbConexion.getResultUniversidades(conn);
       while (rs.next()) {
         universidades.add(
           Universidad.builder()

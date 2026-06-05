@@ -37,6 +37,7 @@ pageEncoding="UTF-8"%>
             <th>Genero</th>
             <th>Salario</th>
             <th></th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -51,6 +52,7 @@ pageEncoding="UTF-8"%>
                 <td><%=empleado.genero().name()%></td>
                 <td><%=numberFormat.format(empleado.salario())%></td>
                 <td><a href="DetallesController?idEmpleado=<%=empleado.id()%>">Detalles</a></td>
+                <td><a href="UpdateController?idEmpleado=<%=empleado.id()%>">Modificación</a></td>
               </tr>
               <%
             }

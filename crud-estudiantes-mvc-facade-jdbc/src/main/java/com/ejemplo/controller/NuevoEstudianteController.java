@@ -28,7 +28,7 @@ public class NuevoEstudianteController extends HttpServlet {
   
   private static final long serialVersionUID = 1L;
   private static final Logger LOG = Logger.getLogger("NuevoEstudianteController");
-  private static final String SEPARADOR = ";";
+  private static final String SEPARADOR = "\n";
 
   /**
    *  @see HttpServlet#HttpServlet()
@@ -80,11 +80,13 @@ public class NuevoEstudianteController extends HttpServlet {
     List<String> direccionesCorreo = null;
     if (correos != null) {
       direccionesCorreo = Arrays.asList(correos.split(SEPARADOR));
+      direccionesCorreo.replaceAll(String::trim);
       LOG.log(Level.INFO, "Correos: {0}", direccionesCorreo);
     }
     List<String> numerosTelefono = null;
     if (telefonos != null) {
       numerosTelefono = Arrays.asList(telefonos.split(SEPARADOR));
+      numerosTelefono.replaceAll(String::trim);
       LOG.log(Level.INFO, "Teléfonos: {0}", numerosTelefono);
     }
     Estudiante estudiante = Estudiante.builder()

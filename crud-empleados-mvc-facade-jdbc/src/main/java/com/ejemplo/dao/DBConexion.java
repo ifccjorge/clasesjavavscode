@@ -141,15 +141,33 @@ public class DBConexion implements AutoCloseable {
       String query = "SELECT dep.nombre nombreDpto, tel.telefono numeroTelefono, cor.email email FROM empleados emp INNER JOIN departamentos dep ON emp.departamentos_id = dep.id LEFT OUTER JOIN telefonos tel ON emp.id = tel.empleados_id LEFT OUTER JOIN correos cor ON emp.id = cor.empleados_id WHERE emp.id = ?";
       try {
         PreparedStatement psDetallesEmpleados = connection.prepareStatement(
-          query,
-          ResultSet.TYPE_SCROLL_INSENSITIVE,
-          ResultSet.CONCUR_UPDATABLE
-        );
-          psDetallesEmpleados.setInt(1, id);
-          rs = psDetallesEmpleados.executeQuery();
+            query,
+            ResultSet.TYPE_SCROLL_INSENSITIVE,
+            ResultSet.CONCUR_UPDATABLE);
+        psDetallesEmpleados.setInt(1, id);
+        rs = psDetallesEmpleados.executeQuery();
       } catch (SQLException ex) {
-          System.getLogger(DBConexion.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+        System.getLogger(DBConexion.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
       }
       return rs;
     }
+
+    public ResultSet getEmpleadosById(
+        Connection connection,
+        int id) {
+      ResultSet rs = null;
+      String query = "select emp.id idEmpleado, emp.nombre nombreEmpleado, emp.primerApellido, emp.segundoApellido, emp.fechaAlta, emp.genero, emp.salario, emp.departamentos_id, dep.id idDpto, dep.nombre nombreDpto, tel.telefono, co.email from empleados emp left join departamentos dep on emp.departamentos_id = dep.id left join correos co on emp.id = co.empleados_id left join telefonos tel on emp.id = tel.empleados_id where emp.id = ?";
+      try {
+        PreparedStatement psDetallesEmpleados = connection.prepareStatement(
+            query,
+            ResultSet.TYPE_SCROLL_INSENSITIVE,
+            ResultSet.CONCUR_UPDATABLE);
+        psDetallesEmpleados.setInt(1, id);
+        rs = psDetallesEmpleados.executeQuery();
+      } catch (SQLException ex) {
+        System.getLogger(DBConexion.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+      }
+      return rs;
+    }
+
 }

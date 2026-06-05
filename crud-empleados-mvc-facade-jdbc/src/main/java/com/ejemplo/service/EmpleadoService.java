@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.ejemplo.models.Detalle;
 import com.ejemplo.models.Empleado;
+import com.ejemplo.models.EmpleadoUpdate;
 
 public interface EmpleadoService {
   public abstract boolean isConnectionOK() throws SQLException, Exception;
@@ -14,5 +15,7 @@ public interface EmpleadoService {
     List<String> emails,
     List<String> telefonos
   ) throws SQLException;
+
   public abstract Detalle getDetalles(int idEmpleado);
+  public abstract EmpleadoUpdate getEmpleadosById(int idEmpleado);
 }

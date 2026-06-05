@@ -45,7 +45,7 @@ public class BaseDatosConexion implements AutoCloseable {
       this.connection.close();
     }
     
-    public ResultSet getEmpleados(Connection connection) {
+    public ResultSet getResultEstudiantes(Connection connection) {
       ResultSet rs = null;
       String query = "SELECT * FROM estudiantes";
       Statement stmt;
@@ -58,7 +58,7 @@ public class BaseDatosConexion implements AutoCloseable {
       return rs;
     }
 
-    public ResultSet getUniversidades(Connection connection) {
+    public ResultSet getResultUniversidades(Connection connection) {
       ResultSet rs = null;
       String query = "SELECT * FROM universidades ORDER BY nombre";
       Statement stmt;
@@ -131,6 +131,23 @@ public class BaseDatosConexion implements AutoCloseable {
             System.getLogger(BaseDatosConexion.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
           }
       }
+    }
+
+    public ResultSet getResultDetalleEstudiantes(
+        Connection connection,
+        int id) {
+      ResultSet rs = null;
+      String query = "SELECT 1, nombre FROM universidades WHERE id = (SELECT universidades_id FROM estudiantes WHERE id = ?) UNION SELECT 2, email FROM correos WHERE estudiantes_id = ? UNION SELECT 3, telefono FROM telefonos WHERE estudiantes_id = ?";
+      try {
+        PreparedStatement psDetalleEstudiantes = connection.prepareStatement(query);
+        psDetalleEstudiantes.setInt(1, id);
+        psDetalleEstudiantes.setInt(2, id);
+        psDetalleEstudiantes.setInt(3, id);
+        rs = psDetalleEstudiantes.executeQuery();
+      } catch (SQLException ex) {
+        System.getLogger(BaseDatosConexion.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+      }
+      return rs;
     }
 
 }

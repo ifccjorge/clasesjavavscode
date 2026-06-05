@@ -79,11 +79,13 @@ public class AltaController extends HttpServlet {
     List<String> direccionesCorreo = null;
     if (correos != null) {
       direccionesCorreo = Arrays.asList(correos.split(SEPARADOR));
+      direccionesCorreo.replaceAll(String::trim);
       LOG.log(Level.INFO, "Correos: {0}", direccionesCorreo);
     }
     List<String> numerosTelefono = null;
     if (telefonos != null) {
       numerosTelefono = Arrays.asList(telefonos.split(SEPARADOR));
+      numerosTelefono.replaceAll(String::trim);
       LOG.log(Level.INFO, "Teléfonos: {0}", numerosTelefono);
     }
     Empleado empleado = Empleado.builder()
