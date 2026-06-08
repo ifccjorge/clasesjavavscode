@@ -170,4 +170,59 @@ public class DBConexion implements AutoCloseable {
       return rs;
     }
 
+    public void actualizaEmpleado(
+      Connection connection,
+      Empleado empleado,
+      List<String> emails,
+      List<String> telefonos
+    ) {
+      String queryUpdate = "UPDATE `empleados` SET `nombre` = ?, `primerApellido` = ?, `segundoApellido` = ?, `fechaAlta` = ?, `genero` = ?, `salario` = ?, `departamentos_id` = ? WHERE (`id` = ?)";
+      String queryEliminarTelefonos = "DELETE FROM telefonos WHERE empleados_id = ?";
+      String queryInsertarTelefonos = "INSERT INTO `telefonos` (`telefono`, `empleados_id`) VALUES (?, ?)";
+      String queryEliminarCorreos = "DELETE FROM correos WHERE empleados_id = ?";
+      String queryInsertarCorreos = "INSERT INTO `correos` (`email`, `empleados_id`) VALUES (?, ?)";
+      try {
+        // Actualizar empleados
+        PreparedStatement psUpdate = connection.prepareStatement(queryUpdate);
+        psUpdate.setString(1, empleado.nombre());
+        psUpdate.setString(2, empleado.primerApellido());
+        psUpdate.setString(3, empleado.segundoApellido());
+        psUpdate.setDate(4, Date.valueOf(empleado.fechaAlta()));
+        psUpdate.setString(5, empleado.genero().name());
+        psUpdate.setBigDecimal(6, empleado.salario());
+        psUpdate.setInt(7, empleado.departamentos_id());
+        psUpdate.setInt(8, empleado.id());
+        psUpdate.executeUpdate();
+        // Eliminar teléfonos
+        PreparedStatement psEliminarTelefonos = connection.prepareStatement(queryEliminarTelefonos);
+        psEliminarTelefonos.setInt(1, empleado.id());
+        psEliminarTelefonos.executeUpdate();
+        // Insertar teléfonos
+        PreparedStatement psInsertarTelefonos = connection.prepareStatement(queryInsertarTelefonos);
+        psInsertarTelefonos.setInt(2, empleado.id());
+        psInsertarTelefonos.setInt(1, empleado.id());
+        for (String telefono : telefonos) {
+          psInsertarTelefonos.setString(1, telefono);
+          psInsertarTelefonos.addBatch();
+        }
+        psInsertarTelefonos.executeBatch();
+        // Eliminar correos
+        PreparedStatement psEliminarCorreos = connection.prepareStatement(queryEliminarCorreos);
+        psEliminarCorreos.setInt(1, empleado.id());
+        psEliminarCorreos.executeUpdate();
+        // Insertar correos
+        PreparedStatement psInsertarCorreos = connection.prepareStatement(queryInsertarCorreos);
+        psInsertarCorreos.setInt(2, empleado.id());
+        psInsertarCorreos.setInt(1, empleado.id());
+        for (String email : emails) {
+          psInsertarCorreos.setString(1, email);
+          psInsertarCorreos.addBatch();
+        }
+        psInsertarCorreos.executeBatch();
+      } catch (SQLException ex) {
+          System.getLogger(DBConexion.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+      }
+      
+    }
+
 }

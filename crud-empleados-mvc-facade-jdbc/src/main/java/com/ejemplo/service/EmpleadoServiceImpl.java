@@ -145,12 +145,15 @@ public class EmpleadoServiceImpl implements EmpleadoService {
           nombreDpto = rs.getString("nombreDpto");
         }
         rs.beforeFirst();
+        String valor;
         while (rs.next()) {
-          telefonos.add(rs.getString("telefono"));
+          valor = rs.getString("telefono");
+          if (valor != null) telefonos.add(valor);
         }
         rs.beforeFirst();
         while (rs.next()) {
-          emails.add(rs.getString("email"));
+          valor = rs.getString("email");
+          if (valor != null) emails.add(valor);
         }
         rs.close();
         // Detalle del empleado
@@ -175,4 +178,14 @@ public class EmpleadoServiceImpl implements EmpleadoService {
       return empleadoUpdate;
     }
 
+    @Override
+    public void updateEmpleado(Empleado empleado, List<String> emails, List<String> telefonos) throws SQLException {
+      try (
+        DBConexion dbConexion = new DBConexion("cursom", "Temp2026$$");
+        Connection connection = dbConexion.getConexion();) {
+        dbConexion.actualizaEmpleado(connection, empleado, emails, telefonos);
+      } catch (Exception ex) {
+        System.getLogger(EmpleadoServiceImpl.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+      }
+    }
 }

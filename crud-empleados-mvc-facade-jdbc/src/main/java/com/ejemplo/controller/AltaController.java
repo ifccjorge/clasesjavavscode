@@ -59,6 +59,7 @@ public class AltaController extends HttpServlet {
       throws ServletException, IOException {
     
     // Recepción de parámetros
+    int idEmpleado = Integer.parseInt(request.getParameter("idEmpleado"));
     String nombre = request.getParameter("nombre");
     String primerApellido = request.getParameter("primerApellido");
     String segundoApellido = request.getParameter("segundoApellido") == null ? "" : request
@@ -89,6 +90,7 @@ public class AltaController extends HttpServlet {
       LOG.log(Level.INFO, "Teléfonos: {0}", numerosTelefono);
     }
     Empleado empleado = Empleado.builder()
+      .id(idEmpleado)
       .nombre(nombre)
       .primerApellido(primerApellido)
       .segundoApellido(segundoApellido)
@@ -98,14 +100,21 @@ public class AltaController extends HttpServlet {
       .departamentos_id(departamentos_id)
       .build();
     LOG.log(Level.INFO, "EMPLEADO: {0}", empleado);
-    
+    // 
     EmpleadoService empleadoService = new EmpleadoServiceImpl();
-    try {
-        empleadoService.altaEmpleado(empleado, direccionesCorreo, numerosTelefono);
-    } catch (SQLException ex) {
+    if (idEmpleado == 0) {
+      try {
+          empleadoService.altaEmpleado(empleado, direccionesCorreo, numerosTelefono);
+      } catch (SQLException ex) {
+          System.getLogger(AltaController.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+      }
+    } else {
+      try {
+        empleadoService.updateEmpleado(empleado, direccionesCorreo, numerosTelefono);
+      } catch (SQLException ex) {
         System.getLogger(AltaController.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+      }
     }
-
     List<Empleado> empleados = empleadoService.getEmpleadoList();
     request.setAttribute("empleados", empleados);
     request.getRequestDispatcher("views/listadoEmpleados.jsp").forward(request, response);

@@ -1,10 +1,14 @@
 package com.ejemplo.controller;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.ejemplo.models.Departamento;
 import com.ejemplo.models.EmpleadoUpdate;
+import com.ejemplo.service.DepartamentoService;
+import com.ejemplo.service.DepartamentoServiceImpl;
 import com.ejemplo.service.EmpleadoService;
 import com.ejemplo.service.EmpleadoServiceImpl;
 
@@ -37,17 +41,20 @@ public class UpdateController extends HttpServlet {
     int idEmpleado = Integer.parseInt(request.getParameter("idEmpleado"));
     LOG.log(Level.INFO, "Empleado recibido: {0}", idEmpleado);
     // Capa de servicio
+    DepartamentoService departamentoService = new DepartamentoServiceImpl();
     EmpleadoService empleadoService = new EmpleadoServiceImpl();
+    List<Departamento> departamentos = null;
     EmpleadoUpdate empleadoUpdate = null;
     try {
       empleadoUpdate = empleadoService.getEmpleadosById(idEmpleado);
-      //empleado = empleadoService.getEmpleadoList().stream().filter(e -> e.id() == idEmpleado).toList().getFirst();
+      departamentos = departamentoService.getDepartamentoList();
+      LOG.log(Level.INFO, "Empleado actualizar: {0}", empleadoUpdate);
     } catch (Exception ex) {
-        System.getLogger(MainController.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+      System.getLogger(MainController.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
     }
-
+    request.setAttribute("departamentos", departamentos);
     request.setAttribute("empleadoUpdate", empleadoUpdate);
-    //request.getRequestDispatcher("views/detalleEmpleado.jsp").forward(request, response);
+    request.getRequestDispatcher("views/formularioAltaModificacion.jsp").forward(request, response);
 
   }
 

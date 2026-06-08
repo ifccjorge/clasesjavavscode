@@ -15,7 +15,11 @@ public interface EmpleadoService {
     List<String> emails,
     List<String> telefonos
   ) throws SQLException;
-
   public abstract Detalle getDetalles(int idEmpleado);
   public abstract EmpleadoUpdate getEmpleadosById(int idEmpleado);
+  public abstract void updateEmpleado(
+      Empleado empleado,
+      List<String> emails,
+      List<String> telefonos
+  ) throws SQLException;
 }
