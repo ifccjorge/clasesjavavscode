@@ -1,3 +1,4 @@
+<%@ page import="com.ejemplo.models.EstudianteDetalle"%>
 <%@ page import="com.ejemplo.models.Universidad"%>
 <%@ page import="java.util.List"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -13,6 +14,10 @@ pageEncoding="UTF-8"%>
     <fieldset>
       <legend>Formulario de gestión de estudiantes</legend>
       <form action="altaestudiante" method="post">
+        <%
+          EstudianteDetalle estudianteDetalle = (EstudianteDetalle) request.getAttribute("estudianteDetalle");
+        %>
+        <input type="hidden" name="idEstudiante" value="<%=estudianteDetalle != null ? estudianteDetalle.idEstudiante() : 0%>">
         <div>
           <label for="nombre">Nombre:</label>
           <input
@@ -20,6 +25,7 @@ pageEncoding="UTF-8"%>
             size="60"
             id="nombre"
             name="nombre"
+            value="<%=estudianteDetalle != null ? estudianteDetalle.nombre() : ""%>"
             placeholder="su nombre aquí, por favor"
             required
           />

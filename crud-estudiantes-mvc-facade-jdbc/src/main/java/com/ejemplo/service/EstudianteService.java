@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.ejemplo.models.Detalle;
 import com.ejemplo.models.Estudiante;
+import com.ejemplo.models.EstudianteDetalle;
 
 public interface EstudianteService {
   public abstract List<Estudiante> getEstudianteList();
@@ -13,5 +14,11 @@ public interface EstudianteService {
     List<String> emails,
     List<String> telefonos
   ) throws SQLException;
-  public abstract Detalle getDetalleEstudiante(int idEmpleado);
+  public abstract Detalle getDetalleEstudiante(int idEstudiante);
+  public abstract EstudianteDetalle getEstudianteId(int idEstudiante);
+  public abstract void actualizacionEstudiante(
+      Estudiante estudiante,
+      List<String> emails,
+      List<String> telefonos
+  ) throws SQLException;
 }

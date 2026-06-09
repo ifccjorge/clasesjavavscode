@@ -39,6 +39,7 @@ pageEncoding="UTF-8"%>
             <th>Beca concedida</th>
             <th>Universidad</th>
             <th></th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -55,6 +56,7 @@ pageEncoding="UTF-8"%>
                 <td><%=numberFormat.format(estudiante.becaConcedida())%></td>
                 <td><%=estudiante.universidades_id()%></td>
                 <td><a href="detalleestudiante?idEstudiante=<%=estudiante.id()%>">Detalles</a></td>
+                <td><a href="modificacionestudiantes?idEstudiante=<%=estudiante.id()%>">Modificación</a></td>
               </tr>
               <%
             }

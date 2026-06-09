@@ -150,4 +150,74 @@ public class BaseDatosConexion implements AutoCloseable {
       return rs;
     }
 
+    public ResultSet getResultEstudianteId(
+        Connection connection,
+        int id
+    ) {
+      ResultSet rs = null;
+      String query = "SELECT e.id idEstudiante, e.nombre, e.primerApellido, e.segundoApellido, e.genero, e.totalAsignaturas, e.fechaNacimiento, e.becaConcedida, e.universidades_id idUniversidad, u.nombre nombreUniversidad, GROUP_CONCAT(DISTINCT c.email SEPARATOR '\\n') correos, GROUP_CONCAT(DISTINCT t.telefono SEPARATOR '\\n') telefonos FROM estudiantes e INNER JOIN universidades u ON e.universidades_id = u.id LEFT OUTER JOIN correos c ON e.id = c.estudiantes_id LEFT OUTER JOIN telefonos t ON e.id = t.estudiantes_id WHERE e.id = ? GROUP BY e.id, e.nombre, e.primerApellido, e.segundoApellido, e.genero, e.totalAsignaturas, e.fechaNacimiento, e.becaConcedida, e.universidades_id, u.nombre";
+      try {
+        PreparedStatement psEstudiante = connection.prepareStatement(query);
+        psEstudiante.setInt(1, id);
+        rs = psEstudiante.executeQuery();
+      } catch (SQLException ex) {
+        System.getLogger(BaseDatosConexion.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+      }
+      return rs;
+    }
+
+    public void actualizacionEstudianteId(
+      Connection connection,
+      Estudiante estudiante,
+      List<String> emails,
+      List<String> telefonos
+    ) {
+      String queryUpdate = "UPDATE `empleados` SET `nombre` = ?, `primerApellido` = ?, `segundoApellido` = ?, `fechaAlta` = ?, `genero` = ?, `salario` = ?, `departamentos_id` = ? WHERE (`id` = ?)";
+      String queryEliminarTelefonos = "DELETE FROM telefonos WHERE empleados_id = ?";
+      String queryInsertarTelefonos = "INSERT INTO `telefonos` (`telefono`, `empleados_id`) VALUES (?, ?)";
+      String queryEliminarCorreos = "DELETE FROM correos WHERE empleados_id = ?";
+      String queryInsertarCorreos = "INSERT INTO `correos` (`email`, `empleados_id`) VALUES (?, ?)";
+      try {
+        // Actualizar empleados
+        PreparedStatement psActualizarEstudiante = connection.prepareStatement(queryUpdate);
+        psActualizarEstudiante.setString(1, estudiante.nombre());
+        psActualizarEstudiante.setString(2, estudiante.primerApellido());
+        psActualizarEstudiante.setString(3, estudiante.segundoApellido());
+        psActualizarEstudiante.setString(5, estudiante.genero().name());
+        psActualizarEstudiante.setInt(7, estudiante.totalAsignaturas());
+        psActualizarEstudiante.setDate(4, Date.valueOf(estudiante.fechaNacimiento()));
+        psActualizarEstudiante.setBigDecimal(6, estudiante.becaConcedida());
+        psActualizarEstudiante.setInt(7, estudiante.universidades_id());
+        psActualizarEstudiante.setInt(8, estudiante.id());
+        psActualizarEstudiante.executeUpdate();
+        // Eliminar teléfonos
+        PreparedStatement psEliminarTelefonos = connection.prepareStatement(queryEliminarTelefonos);
+        psEliminarTelefonos.setInt(1, estudiante.id());
+        psEliminarTelefonos.executeUpdate();
+        // Insertar teléfonos
+        PreparedStatement psInsertarTelefonos = connection.prepareStatement(queryInsertarTelefonos);
+        psInsertarTelefonos.setInt(2, estudiante.id());
+        psInsertarTelefonos.setInt(1, estudiante.id());
+        for (String telefono : telefonos) {
+          psInsertarTelefonos.setString(1, telefono);
+          psInsertarTelefonos.addBatch();
+        }
+        psInsertarTelefonos.executeBatch();
+        // Eliminar correos
+        PreparedStatement psEliminarCorreos = connection.prepareStatement(queryEliminarCorreos);
+        psEliminarCorreos.setInt(1, estudiante.id());
+        psEliminarCorreos.executeUpdate();
+        // Insertar correos
+        PreparedStatement psInsertarCorreos = connection.prepareStatement(queryInsertarCorreos);
+        psInsertarCorreos.setInt(2, estudiante.id());
+        psInsertarCorreos.setInt(1, estudiante.id());
+        for (String email : emails) {
+          psInsertarCorreos.setString(1, email);
+          psInsertarCorreos.addBatch();
+        }
+        psInsertarCorreos.executeBatch();
+      } catch (SQLException ex) {
+        System.getLogger(BaseDatosConexion.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+      }
+    }
 }
