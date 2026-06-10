@@ -58,6 +58,7 @@ public class NuevoEstudianteController extends HttpServlet {
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws ServletException, IOException {
     // Recepción de parámetros
+    int idEstudiante = Integer.parseInt(request.getParameter("idEstudiante"));
     String nombre = request.getParameter("nombre");
     String primerApellido = request.getParameter("primerApellido");
     String segundoApellido = request.getParameter("segundoApellido") == null ? "" : request
@@ -90,6 +91,7 @@ public class NuevoEstudianteController extends HttpServlet {
       LOG.log(Level.INFO, "Teléfonos: {0}", numerosTelefono);
     }
     Estudiante estudiante = Estudiante.builder()
+      .id(idEstudiante)
       .nombre(nombre)
       .primerApellido(primerApellido)
       .segundoApellido(segundoApellido)
@@ -99,18 +101,20 @@ public class NuevoEstudianteController extends HttpServlet {
       .becaConcedida(becaConcedida)
       .universidades_id(universidades_id)
       .build();
-    LOG.log(Level.INFO, "EMPLEADO: {0}", estudiante);
+    LOG.log(Level.INFO, "ESTUDIANTE: {0}", estudiante);
     EstudianteService estudianteService = new EstudianteServiceImpl();
-    
+    // Alta o actualización
     try {
+      if (idEstudiante == 0) {
         estudianteService.altaEstudiante(estudiante, direccionesCorreo, numerosTelefono);
+      } else {
+        estudianteService.actualizacionEstudiante(estudiante, direccionesCorreo, numerosTelefono);
+      }
     } catch (SQLException ex) {
-        System.getLogger(NuevoEstudianteController.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
+      System.getLogger(NuevoEstudianteController.class.getName()).log(System.Logger.Level.ERROR, (String) null, ex);
     }
-
     List<Estudiante> estudiantes = estudianteService.getEstudianteList();
     request.setAttribute("estudiantes", estudiantes);
     request.getRequestDispatcher("views/listadoEstudiantes.jsp").forward(request, response);
-
   }
 }

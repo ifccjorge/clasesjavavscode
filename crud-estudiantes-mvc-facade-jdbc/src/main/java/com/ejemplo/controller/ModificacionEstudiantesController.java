@@ -39,7 +39,7 @@ public class ModificacionEstudiantesController extends HttpServlet {
       throws ServletException, IOException {
 
     int idEstudiante = Integer.parseInt(request.getParameter("idEstudiante"));
-    LOG.log(Level.INFO, "Empleado recibido: {0}", idEstudiante);
+    LOG.log(Level.INFO, "Estudiante recibido: {0}", idEstudiante);
     // Capa de servicio
     EstudianteService estudianteService = new EstudianteServiceImpl();
     UniversidadService universidadService = new UniversidadServiceImpl();

@@ -77,29 +77,28 @@ public class BaseDatosConexion implements AutoCloseable {
       List<String> dirCorreos,
       List<String> numTelefonos
     ) {
-      String queryInsertEmpleado = "INSERT INTO `estudiantes` (`nombre`, `primerApellido`, `segundoApellido`, `genero`, `totalAsignaturas`, `fechaNacimiento`, `becaConcedida`, `universidades_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-      String queryInsertCorreo = "INSERT INTO `correos` (`email`, `estudiantes_id`) VALUES (?, ?)";
-      String queryInsertTelefono = "INSERT INTO `telefonos` (`telefono`, `estudiantes_id`) VALUES (?, ?)";
+      String queryInsertEstudiante = "INSERT INTO estudiantes (nombre, primerApellido, segundoApellido, genero, totalAsignaturas, fechaNacimiento, becaConcedida, universidades_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+      String queryInsertCorreo = "INSERT INTO correos (email, estudiantes_id) VALUES (?, ?)";
+      String queryInsertTelefono = "INSERT INTO telefonos (telefono, estudiantes_id) VALUES (?, ?)";
       try {
         // Transacción
         connection.setAutoCommit(false);
-        // Insertar empleados
-        PreparedStatement psInsertEmpleado = connection.prepareStatement(queryInsertEmpleado, Statement.RETURN_GENERATED_KEYS);
-        psInsertEmpleado.setString(1, estudiante.nombre());
-        psInsertEmpleado.setString(2, estudiante.primerApellido());
-        psInsertEmpleado.setString(3, estudiante.segundoApellido());
-        psInsertEmpleado.setString(4, estudiante.genero().name());
-        psInsertEmpleado.setInt(5, estudiante.totalAsignaturas());
-        psInsertEmpleado.setDate(6, Date.valueOf(estudiante.fechaNacimiento()));
-        psInsertEmpleado.setDouble(7, estudiante.becaConcedida().doubleValue());
-        psInsertEmpleado.setInt(8, estudiante.universidades_id());
-        int totalFilas = psInsertEmpleado.executeUpdate();
+        // Insertar estudiante
+        PreparedStatement psInsertEstudiante = connection.prepareStatement(queryInsertEstudiante, Statement.RETURN_GENERATED_KEYS);
+        psInsertEstudiante.setString(1, estudiante.nombre());
+        psInsertEstudiante.setString(2, estudiante.primerApellido());
+        psInsertEstudiante.setString(3, estudiante.segundoApellido());
+        psInsertEstudiante.setString(4, estudiante.genero().name());
+        psInsertEstudiante.setInt(5, estudiante.totalAsignaturas());
+        psInsertEstudiante.setDate(6, Date.valueOf(estudiante.fechaNacimiento()));
+        psInsertEstudiante.setDouble(7, estudiante.becaConcedida().doubleValue());
+        psInsertEstudiante.setInt(8, estudiante.universidades_id());
+        int totalFilas = psInsertEstudiante.executeUpdate();
         if (totalFilas != 0) {
           // Recuperar índice
           long lastInsertedId = 0L;
-          ResultSet rsIdEmpleado = psInsertEmpleado.getGeneratedKeys();
-          if (rsIdEmpleado.next())
-            lastInsertedId = rsIdEmpleado.getLong(1);
+          ResultSet rsIdEstudiante = psInsertEstudiante.getGeneratedKeys();
+          if (rsIdEstudiante.next()) lastInsertedId = rsIdEstudiante.getLong(1);
           // Insertar correos
           if (dirCorreos != null && !dirCorreos.isEmpty()) {
             PreparedStatement psInsertCorreo = connection.prepareStatement(queryInsertCorreo);
@@ -155,7 +154,7 @@ public class BaseDatosConexion implements AutoCloseable {
         int id
     ) {
       ResultSet rs = null;
-      String query = "SELECT e.id idEstudiante, e.nombre, e.primerApellido, e.segundoApellido, e.genero, e.totalAsignaturas, e.fechaNacimiento, e.becaConcedida, e.universidades_id idUniversidad, u.nombre nombreUniversidad, GROUP_CONCAT(DISTINCT c.email SEPARATOR '\\n') correos, GROUP_CONCAT(DISTINCT t.telefono SEPARATOR '\\n') telefonos FROM estudiantes e INNER JOIN universidades u ON e.universidades_id = u.id LEFT OUTER JOIN correos c ON e.id = c.estudiantes_id LEFT OUTER JOIN telefonos t ON e.id = t.estudiantes_id WHERE e.id = ? GROUP BY e.id, e.nombre, e.primerApellido, e.segundoApellido, e.genero, e.totalAsignaturas, e.fechaNacimiento, e.becaConcedida, e.universidades_id, u.nombre";
+      String query = "SELECT e.id idEstudiante, e.nombre nombreEstudiante, e.primerApellido, e.segundoApellido, e.genero, e.totalAsignaturas, e.fechaNacimiento, e.becaConcedida, e.universidades_id idUniversidad, u.nombre nombreUniversidad, GROUP_CONCAT(DISTINCT c.email SEPARATOR '\\n') correos, GROUP_CONCAT(DISTINCT t.telefono SEPARATOR '\\n') telefonos FROM estudiantes e INNER JOIN universidades u ON e.universidades_id = u.id LEFT OUTER JOIN correos c ON e.id = c.estudiantes_id LEFT OUTER JOIN telefonos t ON e.id = t.estudiantes_id WHERE e.id = ? GROUP BY e.id, e.nombre, e.primerApellido, e.segundoApellido, e.genero, e.totalAsignaturas, e.fechaNacimiento, e.becaConcedida, e.universidades_id, u.nombre";
       try {
         PreparedStatement psEstudiante = connection.prepareStatement(query);
         psEstudiante.setInt(1, id);
@@ -172,23 +171,23 @@ public class BaseDatosConexion implements AutoCloseable {
       List<String> emails,
       List<String> telefonos
     ) {
-      String queryUpdate = "UPDATE `empleados` SET `nombre` = ?, `primerApellido` = ?, `segundoApellido` = ?, `fechaAlta` = ?, `genero` = ?, `salario` = ?, `departamentos_id` = ? WHERE (`id` = ?)";
-      String queryEliminarTelefonos = "DELETE FROM telefonos WHERE empleados_id = ?";
-      String queryInsertarTelefonos = "INSERT INTO `telefonos` (`telefono`, `empleados_id`) VALUES (?, ?)";
-      String queryEliminarCorreos = "DELETE FROM correos WHERE empleados_id = ?";
-      String queryInsertarCorreos = "INSERT INTO `correos` (`email`, `empleados_id`) VALUES (?, ?)";
+      String queryUpdate = "UPDATE estudiantes SET nombre = ?, primerApellido = ?, segundoApellido = ?, genero = ?, totalAsignaturas = ?, fechaNacimiento = ?, becaConcedida = ?, universidades_id = ? WHERE id = ?";
+      String queryEliminarTelefonos = "DELETE FROM telefonos WHERE estudiantes_id = ?";
+      String queryInsertarTelefonos = "INSERT INTO telefonos (telefono, estudiantes_id) VALUES (?, ?)";
+      String queryEliminarCorreos = "DELETE FROM correos WHERE estudiantes_id = ?";
+      String queryInsertarCorreos = "INSERT INTO correos (email, estudiantes_id) VALUES (?, ?)";
       try {
-        // Actualizar empleados
+        // Actualizar estudiantes
         PreparedStatement psActualizarEstudiante = connection.prepareStatement(queryUpdate);
         psActualizarEstudiante.setString(1, estudiante.nombre());
         psActualizarEstudiante.setString(2, estudiante.primerApellido());
         psActualizarEstudiante.setString(3, estudiante.segundoApellido());
-        psActualizarEstudiante.setString(5, estudiante.genero().name());
-        psActualizarEstudiante.setInt(7, estudiante.totalAsignaturas());
-        psActualizarEstudiante.setDate(4, Date.valueOf(estudiante.fechaNacimiento()));
-        psActualizarEstudiante.setBigDecimal(6, estudiante.becaConcedida());
-        psActualizarEstudiante.setInt(7, estudiante.universidades_id());
-        psActualizarEstudiante.setInt(8, estudiante.id());
+        psActualizarEstudiante.setString(4, estudiante.genero().name());
+        psActualizarEstudiante.setInt(5, estudiante.totalAsignaturas());
+        psActualizarEstudiante.setDate(6, Date.valueOf(estudiante.fechaNacimiento()));
+        psActualizarEstudiante.setBigDecimal(7, estudiante.becaConcedida());
+        psActualizarEstudiante.setInt(8, estudiante.universidades_id());
+        psActualizarEstudiante.setInt(9, estudiante.id());
         psActualizarEstudiante.executeUpdate();
         // Eliminar teléfonos
         PreparedStatement psEliminarTelefonos = connection.prepareStatement(queryEliminarTelefonos);
@@ -197,7 +196,6 @@ public class BaseDatosConexion implements AutoCloseable {
         // Insertar teléfonos
         PreparedStatement psInsertarTelefonos = connection.prepareStatement(queryInsertarTelefonos);
         psInsertarTelefonos.setInt(2, estudiante.id());
-        psInsertarTelefonos.setInt(1, estudiante.id());
         for (String telefono : telefonos) {
           psInsertarTelefonos.setString(1, telefono);
           psInsertarTelefonos.addBatch();
@@ -210,7 +208,6 @@ public class BaseDatosConexion implements AutoCloseable {
         // Insertar correos
         PreparedStatement psInsertarCorreos = connection.prepareStatement(queryInsertarCorreos);
         psInsertarCorreos.setInt(2, estudiante.id());
-        psInsertarCorreos.setInt(1, estudiante.id());
         for (String email : emails) {
           psInsertarCorreos.setString(1, email);
           psInsertarCorreos.addBatch();

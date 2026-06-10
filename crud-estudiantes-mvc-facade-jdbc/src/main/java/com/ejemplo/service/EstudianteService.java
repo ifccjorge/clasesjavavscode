@@ -10,7 +10,7 @@ import com.ejemplo.models.EstudianteDetalle;
 public interface EstudianteService {
   public abstract List<Estudiante> getEstudianteList();
   public abstract void altaEstudiante(
-    Estudiante empleado,
+    Estudiante estudiante,
     List<String> emails,
     List<String> telefonos
   ) throws SQLException;

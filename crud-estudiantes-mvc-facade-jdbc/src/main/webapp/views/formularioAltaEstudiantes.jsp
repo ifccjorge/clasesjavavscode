@@ -1,6 +1,8 @@
 <%@ page import="com.ejemplo.models.EstudianteDetalle"%>
+<%@ page import="com.ejemplo.models.Genero"%>
 <%@ page import="com.ejemplo.models.Universidad"%>
 <%@ page import="java.util.List"%>
+<%@ page import="java.util.stream.Collectors"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -37,6 +39,7 @@ pageEncoding="UTF-8"%>
             size="60"
             id="primerApellido"
             name="primerApellido"
+            value="<%=estudianteDetalle != null ? estudianteDetalle.primerApellido() : ""%>"
             placeholder="su primer apellido aquí, por favor"
             required
           />
@@ -48,6 +51,7 @@ pageEncoding="UTF-8"%>
             size="60"
             id="segundoApellido"
             name="segundoApellido"
+            value="<%=estudianteDetalle != null ? estudianteDetalle.segundoApellido() : ""%>"
             placeholder="su segundo apellido aquí, por favor"
           />
         </div>
@@ -55,11 +59,32 @@ pageEncoding="UTF-8"%>
           <fieldset>
             <legend>Género</legend>
             <label for="hombre">Hombre:</label>
-            <input type="radio" name="genero" id="hombre" value="HOMBRE" required /><br />
+            <input
+              type="radio"
+              name="genero"
+              id="hombre"
+              value="HOMBRE"
+              required
+              <%=estudianteDetalle != null && estudianteDetalle.genero().equals(Genero.HOMBRE) ? "checked" : ""%>
+            /><br />
             <label for="mujer">Mujer:</label>
-            <input type="radio" name="genero" id="mujer" value="MUJER" required /><br />
+            <input
+              type="radio"
+              name="genero"
+              id="mujer"
+              value="MUJER"
+              <%=estudianteDetalle != null && estudianteDetalle.genero().equals(Genero.MUJER) ? "checked" : ""%>
+              required
+            /><br />
             <label for="otro">Otro:</label>
-            <input type="radio" name="genero" id="otro" value="OTRO" required /><br />
+            <input
+              type="radio"
+              name="genero"
+              id="otro"
+              value="OTRO"
+              <%=estudianteDetalle != null && estudianteDetalle.genero().equals(Genero.OTRO) ? "checked" : ""%>
+              required
+            /><br />
           </fieldset>
         </div>
         <div>
@@ -70,6 +95,7 @@ pageEncoding="UTF-8"%>
             id="totalAsignaturas"
             name="totalAsignaturas"
             placeholder="su total de asignaturas aquí, por favor"
+            value="<%=estudianteDetalle != null ? estudianteDetalle.totalAsignaturas() : ""%>"
             required
           />
         </div>
@@ -79,6 +105,7 @@ pageEncoding="UTF-8"%>
             type="date"
             id="fechaNacimiento"
             name="fechaNacimiento"
+            value="<%=estudianteDetalle != null ? estudianteDetalle.fechaNacimiento() : ""%>"
             placeholder="su fecha de nacimiento aquí, por favor"
             required
           />
@@ -90,6 +117,7 @@ pageEncoding="UTF-8"%>
             size="30"
             id="becaConcedida"
             name="becaConcedida"
+            value="<%=estudianteDetalle != null ? estudianteDetalle.becaConcedida() : ""%>"
             placeholder="su beca concedida aquí, por favor"
             required
           />
@@ -102,7 +130,7 @@ pageEncoding="UTF-8"%>
               List<Universidad> universidades = (List<Universidad>) request.getAttribute("universidades");
               for (Universidad universidad : universidades) {
               %>
-                <option value="<%=universidad.id()%>"><%=universidad.nombre()%></option>
+                <option value="<%=universidad.id()%>"<%=estudianteDetalle != null && estudianteDetalle.idUniversidad() == universidad.id() ? " selected" : ""%>><%=universidad.nombre()%></option>
               <%
             }
             %>
@@ -116,7 +144,7 @@ pageEncoding="UTF-8"%>
               cols="40"
               id="correos"
               name="correos"
-              placeholder="uno o varios separados por punto y coma, por favor"></textarea>
+              placeholder="uno o varios separados por punto y coma, por favor"><%=estudianteDetalle != null && estudianteDetalle.correos() != null ? estudianteDetalle.correos().stream().collect(Collectors.joining("\n")) : ""%></textarea>
           </p>
           <p>
             <label for="telefonos">Teléfonos:</label><br/>
@@ -125,7 +153,7 @@ pageEncoding="UTF-8"%>
               cols="40"
               id="telefonos"
               name="telefonos"
-              placeholder="uno o varios separados por punto y coma, por favor"></textarea>
+              placeholder="uno o varios separados por punto y coma, por favor"><%=estudianteDetalle != null && estudianteDetalle.telefonos() != null ? estudianteDetalle.telefonos().stream().collect(Collectors.joining("\n")) : ""%></textarea>
           </p>
         </div>
         <input type="submit" value="Enviar" />

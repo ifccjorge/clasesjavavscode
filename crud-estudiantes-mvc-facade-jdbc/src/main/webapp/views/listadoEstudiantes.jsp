@@ -37,7 +37,6 @@ pageEncoding="UTF-8"%>
             <th>Total asignatura</th>
             <th>Fecha de nacimiento</th>
             <th>Beca concedida</th>
-            <th>Universidad</th>
             <th></th>
             <th></th>
           </tr>
@@ -54,7 +53,6 @@ pageEncoding="UTF-8"%>
                 <td><%=estudiante.totalAsignaturas()%></td>
                 <td><%=estudiante.fechaNacimiento().format(formatters)%></td>
                 <td><%=numberFormat.format(estudiante.becaConcedida())%></td>
-                <td><%=estudiante.universidades_id()%></td>
                 <td><a href="detalleestudiante?idEstudiante=<%=estudiante.id()%>">Detalles</a></td>
                 <td><a href="modificacionestudiantes?idEstudiante=<%=estudiante.id()%>">Modificación</a></td>
               </tr>
