@@ -22,15 +22,19 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name="empleados")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Data
+@Getter
+@Setter
+@ToString
 public class Empleado implements Serializable {
   @Id
   @GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -41,13 +45,12 @@ public class Empleado implements Serializable {
   @Enumerated(EnumType.STRING)
   private Genero genero;
   @DateTimeFormat(pattern="yyyy-MM-dd")
-  //@DateTimePattern(pattern="yyyy-MM-dd")
   private LocalDate fechaAlta;
   private BigDecimal salario;
   @ManyToOne(fetch=FetchType.LAZY)
   private Departamento departamento;
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "empleado")
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "empleado")
   private Set<Telefono> telefono;
-  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "empleado")
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "empleado")
   private Set<Correo> emails;
 }
