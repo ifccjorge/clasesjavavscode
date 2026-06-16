@@ -1,7 +1,6 @@
 package com.ejemplo.entities;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 
@@ -28,13 +27,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "empleados")
+@Table(name = "estudiantes")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
 @Setter
-public class Empleado implements Serializable {
+public class Estudiante implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
@@ -44,15 +43,12 @@ public class Empleado implements Serializable {
   @Enumerated(EnumType.STRING)
   private Genero genero;
   @DateTimeFormat(pattern = "yyyy-MM-dd")
-  private LocalDate fechaAlta;
-  private BigDecimal salario;
+  private LocalDate fechaMatricula;
   @ManyToOne(fetch = FetchType.LAZY)
   @EqualsAndHashCode.Exclude
-  private Departamento departamento;
-  @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "empleado")
-  //@EqualsAndHashCode.Exclude
+  private Facultad facultad;
+  @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "estudiante")
   private Set<Telefono> telefonos;
-  @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "empleado")
-  //@EqualsAndHashCode.Exclude
+  @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "estudiante")
   private Set<Correo> emails;
 }

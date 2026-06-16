@@ -1,6 +1,5 @@
 package com.ejemplo.entities;
 
-
 import java.io.Serializable;
 
 import jakarta.persistence.Entity;
@@ -29,6 +28,5 @@ public class Telefono implements Serializable {
   private int id;
   private String numero;
   @ManyToOne(fetch = FetchType.LAZY)
-  //@EqualsAndHashCode.Exclude
-  private Empleado empleado;
+  private Estudiante estudiante;
 }

@@ -14,10 +14,8 @@ import com.ejemplo.entities.Departamento;
 import com.ejemplo.entities.Empleado;
 import com.ejemplo.entities.Telefono;
 import com.ejemplo.model.Genero;
-import com.ejemplo.services.CorreoService;
 import com.ejemplo.services.DepartamentoService;
 import com.ejemplo.services.EmpleadoService;
-import com.ejemplo.services.TelefonoService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,8 +25,8 @@ public class CrudEmpleadosSpringMvcApplication implements CommandLineRunner {
 
   private final EmpleadoService empleadoService;
   private final DepartamentoService departamentoService;
-  private final CorreoService correoService;
-  private final TelefonoService telefonoService;
+  // private final CorreoService correoService;
+  // private final TelefonoService telefonoService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(CrudEmpleadosSpringMvcApplication.class, args);
@@ -48,6 +46,10 @@ public class CrudEmpleadosSpringMvcApplication implements CommandLineRunner {
     departamentoService.saveDepartamento(departamento4);
     departamentoService.saveDepartamento(departamento5);
     // Empleados
+    Telefono telefono1 = Telefono.builder().numero("5550101").build();
+    Telefono telefono2 = Telefono.builder().numero("5550102").build();
+    Telefono telefono3 = Telefono.builder().numero("5550103").build();
+    Correo correo1 = Correo.builder().email("a1@server.net").build();
     Empleado empleado1 = Empleado.builder()
     .nombre("Pedro")
     .primerApellido("Gómez")
@@ -56,10 +58,12 @@ public class CrudEmpleadosSpringMvcApplication implements CommandLineRunner {
     .fechaAlta(LocalDate.of(2021, Month.APRIL, 12))
     .salario(new BigDecimal(1550.25))
     .departamento(departamento1)
-    .telefono(Set.of(Telefono.builder().numero("5550101").build()))
-    .emails(Set.of(Correo.builder().email("a1@server.net").build()))
+    .telefonos(Set.of(telefono1, telefono2, telefono3))
+    .emails(Set.of(correo1))
     .build();
-    empleado1.getTelefono().forEach(telefono -> telefono.setEmpleado(empleado1));
+    //empleado1.setTelefonos(Set.of(telefono1, telefono2, telefono3));
+    //empleado1.setEmail(Set.of(correo1));
+    empleado1.getTelefonos().forEach(telefono -> telefono.setEmpleado(empleado1));
     empleado1.getEmails().forEach(correo -> correo.setEmpleado(empleado1));
     empleadoService.saveEmpleado(empleado1);
   }
