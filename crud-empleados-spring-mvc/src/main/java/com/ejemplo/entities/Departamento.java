@@ -30,6 +30,5 @@ public class Departamento implements Serializable {
   private int id;
   private String nombre;
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "departamento")
-  //@EqualsAndHashCode.Exclude
   private List<Empleado> empleados;
 }

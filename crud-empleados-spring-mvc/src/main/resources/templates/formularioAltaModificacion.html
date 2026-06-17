@@ -1,0 +1,134 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Formulario alta/modificación</title>
+  </head>
+  <body>
+    <h1>Formulario alta/modificación</h1>
+    <fieldset>
+      <legend>Formulario de alta o modificación</legend>
+      <form action="" method="post">
+        <input type="hidden" th:field="*{empleado.id}" />
+        <div>
+          <label for="nombre">Nombre:</label>
+          <input
+            th:field="*{empleado.nombre}"
+            type="text"
+            id="nombre"
+            name="nombre"
+            value=""
+            placeholder="su nombre aquí, por favor"
+            required
+          />
+        </div>
+        <div>
+          <label for="primerApellido">Primer apellido:</label>
+          <input
+            type="text"
+            id="primerApellido"
+            name="primerApellido"
+            value=""
+            placeholder="su primer apellido aquí, por favor"
+            required
+          />
+        </div>
+        <div>
+          <label for="segundoApellido">Segundo apellido:</label>
+          <input
+            type="text"
+            id="segundoApellido"
+            name="segundoApellido"
+            value=""
+            placeholder="su segundo apellido aquí, por favor"
+          />
+        </div>
+        <div>
+          <label for="fechaAlta">Fecha de alta:</label>
+          <input
+            type="date"
+            id="fechaAlta"
+            name="fechaAlta"
+            value=""
+            placeholder="su fecha de alta aquí, por favor"
+            required
+          />
+        </div>
+        <div>
+          <fieldset>
+            <legend>Género</legend>
+            <label for="hombre">Hombre:</label>
+            <input
+              type="radio"
+              name="genero"
+              id="hombre"
+              value="HOMBRE"
+              required
+            /><br />
+            <label for="mujer">Mujer:</label>
+            <input
+              type="radio"
+              name="genero"
+              id="mujer"
+              value="MUJER"
+              required
+            /><br />
+            <label for="otro">Otro:</label>
+            <input
+              type="radio"
+              name="genero"
+              id="otro"
+              value="OTRO"
+              required
+            /><br />
+          </fieldset>
+        </div>
+        <div>
+          <label for="salario">Salario:</label>
+          <input
+            type="text"
+            id="salario"
+            name="salario"
+            value=""
+            placeholder="su salario aquí, por favor"
+            required
+          />
+        </div>
+        <div>
+          <label for="departamento">Departamento:</label>
+          <select id="departamento" name="departamento" required>
+            <option></option>
+            <option
+              th:each="departamento:${departamentos}"
+              th:value="${departamento.id}"
+              th:text="${departamento.nombre}"
+            ></option>
+          </select>
+        </div>
+        <div>
+          <p>
+            <label for="correos">Correos:</label><br />
+            <textarea
+              rows="5"
+              cols="40"
+              id="correos"
+              name="correos"
+              placeholder="uno o varios separados por punto y coma, por favor"
+            ></textarea>
+          </p>
+          <p>
+            <label for="telefonos">Teléfonos:</label><br />
+            <textarea
+              rows="5"
+              cols="40"
+              id="telefonos"
+              name="telefonos"
+              placeholder="uno o varios separados por punto y coma, por favor"
+            ></textarea>
+          </p>
+        </div>
+        <input type="submit" value="Enviar" />
+      </form>
+    </fieldset>
+  </body>
+</html>

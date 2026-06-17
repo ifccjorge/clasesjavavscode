@@ -2,7 +2,10 @@ package com.ejemplo.entities;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Set;
 
 import org.springframework.format.annotation.DateTimeFormat;
@@ -14,15 +17,16 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -35,6 +39,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Empleado implements Serializable {
+  private static final Locale LOCAL = Locale.of("es", "ES");
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
@@ -47,12 +52,26 @@ public class Empleado implements Serializable {
   private LocalDate fechaAlta;
   private BigDecimal salario;
   @ManyToOne(fetch = FetchType.LAZY)
-  @EqualsAndHashCode.Exclude
+  @JoinColumn(
+    name = "departamento_id",
+    nullable = false,
+    foreignKey = @ForeignKey(name = "fk_empleado_departamento")
+  )
   private Departamento departamento;
   @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "empleado")
-  //@EqualsAndHashCode.Exclude
   private Set<Telefono> telefonos;
   @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "empleado")
-  //@EqualsAndHashCode.Exclude
   private Set<Correo> emails;
+
+  public String salarioMoneda() {
+    NumberFormat numberFormat = NumberFormat.getCurrencyInstance(LOCAL);
+    numberFormat.setMinimumFractionDigits(2);
+    numberFormat.setMaximumFractionDigits(2);
+    return numberFormat.format(this.salario);
+  }
+
+  public String fechaFormateada() {
+    DateTimeFormatter formatters = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' uuuu", LOCAL);
+    return this.fechaAlta.format(formatters);
+  }
 }
