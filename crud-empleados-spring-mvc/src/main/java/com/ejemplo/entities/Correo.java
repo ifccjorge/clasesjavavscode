@@ -17,6 +17,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "correos")
@@ -25,6 +26,7 @@ import lombok.Setter;
 @Builder
 @Getter
 @Setter
+@ToString(exclude = { "empleado" })
 public class Correo implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

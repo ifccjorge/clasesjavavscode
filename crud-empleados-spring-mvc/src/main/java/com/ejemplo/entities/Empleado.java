@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -30,6 +31,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "empleados")
@@ -38,8 +40,11 @@ import lombok.Setter;
 @Builder
 @Getter
 @Setter
+@ToString(exclude = { "emails", "telefonos" })
 public class Empleado implements Serializable {
+
   private static final Locale LOCAL = Locale.of("es", "ES");
+  private static final String SEPARADOR = ";";
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
@@ -73,5 +78,13 @@ public class Empleado implements Serializable {
   public String fechaFormateada() {
     DateTimeFormatter formatters = DateTimeFormatter.ofPattern("EEEE, d 'de' MMMM 'de' uuuu", LOCAL);
     return this.fechaAlta.format(formatters);
+  }
+
+  public String correosSeparador() {
+    return String.join(SEPARADOR, this.emails.stream().map(Correo::getEmail).toList());
+  }
+
+  public String telefonosSeparador() {
+    return this.telefonos.stream().collect(Collectors.mapping(Telefono::getNumero, Collectors.joining(SEPARADOR)));
   }
 }

@@ -2,18 +2,23 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="es">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="" />
     <title>Formulario alta/modificación</title>
   </head>
   <body>
     <h1>Formulario alta/modificación</h1>
     <fieldset>
       <legend>Formulario de alta o modificación</legend>
-      <form action="" method="post">
-        <input type="hidden" th:field="*{empleado.id}" />
+      <form
+        th:action="@{/empleados/persistir}"
+        method="post"
+        th:object="${empleado}"
+      >
+        <input type="hidden" th:field="*{id}" />
         <div>
           <label for="nombre">Nombre:</label>
           <input
-            th:field="*{empleado.nombre}"
+            th:field="*{nombre}"
             type="text"
             id="nombre"
             name="nombre"
@@ -25,6 +30,7 @@
         <div>
           <label for="primerApellido">Primer apellido:</label>
           <input
+            th:field="*{primerApellido}"
             type="text"
             id="primerApellido"
             name="primerApellido"
@@ -36,6 +42,7 @@
         <div>
           <label for="segundoApellido">Segundo apellido:</label>
           <input
+            th:field="*{segundoApellido}"
             type="text"
             id="segundoApellido"
             name="segundoApellido"
@@ -46,6 +53,7 @@
         <div>
           <label for="fechaAlta">Fecha de alta:</label>
           <input
+            th:field="*{fechaAlta}"
             type="date"
             id="fechaAlta"
             name="fechaAlta"
@@ -59,6 +67,7 @@
             <legend>Género</legend>
             <label for="hombre">Hombre:</label>
             <input
+              th:field="*{genero}"
               type="radio"
               name="genero"
               id="hombre"
@@ -67,6 +76,7 @@
             /><br />
             <label for="mujer">Mujer:</label>
             <input
+              th:field="*{genero}"
               type="radio"
               name="genero"
               id="mujer"
@@ -75,6 +85,7 @@
             /><br />
             <label for="otro">Otro:</label>
             <input
+              th:field="*{genero}"
               type="radio"
               name="genero"
               id="otro"
@@ -86,6 +97,7 @@
         <div>
           <label for="salario">Salario:</label>
           <input
+            th:field="*{salario}"
             type="text"
             id="salario"
             name="salario"
@@ -107,22 +119,24 @@
         </div>
         <div>
           <p>
-            <label for="correos">Correos:</label><br />
+            <label for="correosFormulario">Correos:</label><br />
             <textarea
+              th:text="${correosSeparador}"
               rows="5"
               cols="40"
-              id="correos"
-              name="correos"
+              id="correosFormulario"
+              name="correosFormulario"
               placeholder="uno o varios separados por punto y coma, por favor"
             ></textarea>
           </p>
           <p>
-            <label for="telefonos">Teléfonos:</label><br />
+            <label for="telefonosFormulario">Teléfonos:</label><br />
             <textarea
+              th:text="${telefonosSeparador}"
               rows="5"
               cols="40"
-              id="telefonos"
-              name="telefonos"
+              id="telefonosFormulario"
+              name="telefonosFormulario"
               placeholder="uno o varios separados por punto y coma, por favor"
             ></textarea>
           </p>

@@ -16,6 +16,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Table(name = "departamento")
@@ -24,6 +25,7 @@ import lombok.Setter;
 @Builder
 @Getter
 @Setter
+@ToString(exclude = { "empleados" })
 public class Departamento implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
