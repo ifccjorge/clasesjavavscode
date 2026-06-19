@@ -4,21 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="" />
     <title>Formulario alta/modificación</title>
-    <style>
-      .text-error {
-        color: red;
-        font-weight: bold;
-      }
-    </style>
   </head>
   <body>
     <h1>Formulario alta/modificación</h1>
     <fieldset>
       <legend>Formulario de alta o modificación</legend>
       <form
-        th:action="@{/empleados/persistir}"
+        th:action="@{/estudiantes/persistir}"
         method="post"
-        th:object="${empleado}"
+        th:object="${estudiante}"
       >
         <input type="hidden" th:field="*{id}" />
         <div>
@@ -32,11 +26,6 @@
             placeholder="su nombre aquí, por favor"
             required
           />
-          <p
-            th:if="${#fields.hasErrors('nombre')}"
-            th:errors="*{nombre}"
-            th:class="text-error"
-          ></p>
         </div>
         <div>
           <label for="primerApellido">Primer apellido:</label>
@@ -62,12 +51,12 @@
           />
         </div>
         <div>
-          <label for="fechaAlta">Fecha de alta:</label>
+          <label for="fechaMatricula">Fecha de alta:</label>
           <input
-            th:field="*{fechaAlta}"
+            th:field="*{fechaMatricula}"
             type="date"
-            id="fechaAlta"
-            name="fechaAlta"
+            id="fechaMatricula"
+            name="fechaMatricula"
             value=""
             placeholder="su fecha de alta aquí, por favor"
             required
@@ -106,25 +95,13 @@
           </fieldset>
         </div>
         <div>
-          <label for="salario">Salario:</label>
-          <input
-            th:field="*{salario}"
-            type="text"
-            id="salario"
-            name="salario"
-            value=""
-            placeholder="su salario aquí, por favor"
-            required
-          />
-        </div>
-        <div>
-          <label for="departamento">Departamento:</label>
-          <select id="departamento" th:field="*{departamento}" required>
+          <label for="facultad">Facultad:</label>
+          <select id="facultad" th:field="*{facultad}" required>
             <option value=""></option>
             <option
-              th:each="departamento:${departamentos}"
-              th:value="${departamento.id}"
-              th:text="${departamento.nombre}"
+              th:each="facultad:${facultades}"
+              th:value="${facultad.id}"
+              th:text="${facultad.nombre}"
             ></option>
           </select>
         </div>
@@ -156,7 +133,7 @@
       </form>
     </fieldset>
     <div>
-      <p><a th:href="@{/empleados/listar}">Listado de empleado</a></p>
+      <p><a th:href="@{/estudiantes/listar}">Listado de estudiante</a></p>
     </div>
   </body>
 </html>

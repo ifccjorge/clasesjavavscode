@@ -26,6 +26,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,10 +47,13 @@ import lombok.ToString;
 public class Empleado implements Serializable {
 
   private static final Locale LOCAL = Locale.of("es", "ES");
-  private static final String SEPARADOR = ";";
+  public static final String SEPARADOR = "\n";
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
+  @NotNull(message = "El nombre no puede estar vacío")
+  @NotBlank(message = "El nombre no puede contener espacios en blanco solamente")
+  @Size(min = 4, max = 30, message = "El nombre debe tener entre 4 y 30 caracteres")
   private String nombre;
   private String primerApellido;
   private String segundoApellido;

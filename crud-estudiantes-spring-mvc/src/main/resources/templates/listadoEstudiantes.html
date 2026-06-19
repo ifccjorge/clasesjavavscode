@@ -1,0 +1,31 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Gestión de estudiantes</title>
+  </head>
+  <body>
+    <h1>Listado de estudiantes</h1>
+    <div>
+      <a th:href="@{/estudiantes/alta}">Alta de un estudiante</a>
+    </div>
+    <table border="4" cellpadding="8" cellspacing="0">
+      <thead>
+        <th>Nombre</th>
+        <th>Primer apellido</th>
+        <th>Segundo apellido</th>
+        <th>Genero</th>
+        <th>Fecha de matrícula</th>
+      </thead>
+      <tbody>
+        <tr th:each="estudiante:${estudiantes}">
+          <td th:text="${estudiante.nombre}"></td>
+          <td th:text="${estudiante.primerApellido}"></td>
+          <td th:text="${estudiante.segundoApellido}"></td>
+          <td th:text="${estudiante.genero.getGenero}"></td>
+          <td th:text="${estudiante.fechaFormateada}"></td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>
