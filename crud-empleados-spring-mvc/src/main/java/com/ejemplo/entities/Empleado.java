@@ -28,6 +28,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,31 +50,39 @@ public class Empleado implements Serializable {
 
   private static final Locale LOCAL = Locale.of("es", "ES");
   public static final String SEPARADOR = "\n";
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
+
   @NotNull(message = "El nombre no puede estar vacío")
   @NotBlank(message = "El nombre no puede contener espacios en blanco solamente")
   @Size(min = 4, max = 30, message = "El nombre debe tener entre 4 y 30 caracteres")
+  @Pattern(regexp = "^([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(\s)?)+$", message = "La primera letra en mayusculas y solo letras de la A a la Z")
   private String nombre;
+  
   private String primerApellido;
   private String segundoApellido;
+
   @Enumerated(EnumType.STRING)
   private Genero genero;
+
   @DateTimeFormat(pattern = "yyyy-MM-dd")
+  @Past(message = "La fecha de alta no puede ser inferior a la fecha actual")
   private LocalDate fechaAlta;
   private BigDecimal salario;
+
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(
-    name = "departamento_id",
-    nullable = false,
-    foreignKey = @ForeignKey(name = "fk_empleado_departamento")
-  )
+  @JoinColumn(name = "departamento_id", nullable = false, foreignKey = @ForeignKey(name = "fk_empleado_departamento"))
   private Departamento departamento;
+
   @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "empleado")
   private Set<Telefono> telefonos;
+  
   @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "empleado")
   private Set<Correo> emails;
+
+  private String foto;
 
   public String salarioMoneda() {
     NumberFormat numberFormat = NumberFormat.getCurrencyInstance(LOCAL);

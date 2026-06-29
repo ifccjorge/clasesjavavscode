@@ -19,6 +19,7 @@
         th:action="@{/empleados/persistir}"
         method="post"
         th:object="${empleado}"
+        enctype="multipart/form-data"
       >
         <input type="hidden" th:field="*{id}" />
         <div>
@@ -151,6 +152,15 @@
               placeholder="uno o varios separados por punto y coma, por favor"
             ></textarea>
           </p>
+        </div>
+        <div>
+          <label for="file">Foto del empleado</label>
+          <input
+            type="file"
+            id="file"
+            name="file"
+            title="Selección de la imagen del empleado"
+          />
         </div>
         <input type="submit" value="Enviar" />
       </form>

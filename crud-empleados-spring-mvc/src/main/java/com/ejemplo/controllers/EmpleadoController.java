@@ -1,5 +1,9 @@
 package com.ejemplo.controllers;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ejemplo.entities.Correo;
 import com.ejemplo.entities.Empleado;
@@ -56,12 +61,27 @@ public class EmpleadoController {
       @ModelAttribute Empleado empleado,
       BindingResult result,
       @RequestParam String telefonosFormulario,
-      @RequestParam String correosFormulario
+      @RequestParam String correosFormulario,
+      @RequestParam(required = false) MultipartFile file
   ) {
     // Comprobación de errores
     if (result.hasErrors()) {
-        model.addAttribute("departamentos", departamentoService.getAllDepartamentos());
-        return "formularioAltaModificacion";
+      model.addAttribute("departamentos", departamentoService.getAllDepartamentos());
+      return "formularioAltaModificacion";
+    }
+    // Foto
+    if (file != null && !file.isEmpty()) {
+      Path rutaRelativa = Paths.get("src/main/resources/static/imagenes");
+      String rutaAbsoluta = rutaRelativa.toFile().getAbsolutePath();
+      Path rutaCompleta = Paths.get(rutaAbsoluta, file.getOriginalFilename());
+      try {
+        byte[] imagenRecibidaEnBytes = file.getBytes();
+        Files.write(rutaCompleta, imagenRecibidaEnBytes);
+        empleado.setFoto(file.getOriginalFilename());
+      } catch (IOException e) {
+        LOG.log(Level.SEVERE, "Error al guardar la imagen del empleado: {0}", e.getMessage());
+        LOG.log(Level.FINE, "Detalle de la excepción al guardar la imagen", e);
+      }
     }
     // Captura parámetros
     LOG.log(Level.INFO, "Empleado recibido: {0}", empleado);
@@ -69,16 +89,21 @@ public class EmpleadoController {
     LOG.log(Level.INFO, "Correos recibidos: {0}", correosFormulario);
     // Incluye teléfonos
     Set<Telefono> telefonos = Arrays.stream(telefonosFormulario.split(Empleado.SEPARADOR)).map(
-      s -> Telefono.builder().numero(s.trim()).empleado(empleado).build()
-    ).collect(HashSet::new, HashSet::add, HashSet::addAll);
+        s -> Telefono.builder().numero(s.trim()).empleado(empleado).build())
+        .collect(HashSet::new, HashSet::add, HashSet::addAll);
     empleado.setTelefonos(telefonos);
     // Incluye correos
     Set<Correo> correos = Arrays.stream(correosFormulario.split(Empleado.SEPARADOR)).map(
-      s -> Correo.builder().email(s.trim()).empleado(empleado).build())
-    .collect(HashSet::new, HashSet::add, HashSet::addAll);
+        s -> Correo.builder().email(s.trim()).empleado(empleado).build())
+        .collect(HashSet::new, HashSet::add, HashSet::addAll);
     empleado.setEmails(correos);
     // Graba empleado
     empleadoService.saveEmpleado(empleado);
     return "redirect:/empleados/listar";
+  }
+
+  public String mostrarDetalles(Model model) {
+    
+    return "";
   }
 }

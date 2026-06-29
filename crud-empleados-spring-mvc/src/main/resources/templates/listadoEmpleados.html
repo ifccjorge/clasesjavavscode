@@ -17,6 +17,7 @@
         <th>Genero</th>
         <th>Salario</th>
         <th>Fecha de alta</th>
+        <th></th>
       </thead>
       <tbody>
         <tr th:each="empleado:${empleados}">
@@ -26,6 +27,9 @@
           <td th:text="${empleado.genero.getGenero}"></td>
           <td th:text="${empleado.salarioMoneda}"></td>
           <td th:text="${empleado.fechaFormateada}"></td>
+          <td>
+            <a th:href="@{/empleados/details/}+${empleado.id}">Detalles</a>
+          </td>
         </tr>
       </tbody>
     </table>
