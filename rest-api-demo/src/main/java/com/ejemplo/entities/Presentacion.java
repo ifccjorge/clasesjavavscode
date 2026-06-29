@@ -10,6 +10,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,11 +29,21 @@ import lombok.ToString;
 @ToString
 @Builder
 public class Presentacion {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
+
+  @NotNull(message = "La presentación tiene que tener un nombre")
+  @NotEmpty(message = "El nombre de la presentación no puede estar vacío")
+  @Size(min = 4, max = 25, message = "El nombre del producto no puede tener menos de 4 caracteres ni más de 25")
   private String nombre;
+
+  @NotNull(message = "La presentación tiene que tener una descripcion")
+  @NotEmpty(message = "La descripcion de la presentación no puede estar vacío")
+  @Size(max = 30, message = "El nombre de la presentación no puede superar los 30 caracteres")
   private String descripcion;
+  
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "presentacion")
   private List<Producto> productos;
 }

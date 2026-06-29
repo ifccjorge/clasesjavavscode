@@ -29,21 +29,28 @@ import lombok.ToString;
 @ToString
 @Builder
 public class Producto {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private int id;
+
   @NotNull(message = "El producto tiene que tener un nombre")
   @NotEmpty(message = "El nombre del procto no puede estar vacío")
   @Size(min = 4, max = 25, message = "El nombre del producto no puede tener menos de 4 caracteres ni más de 25")
   private String nombre;
+
   @NotNull(message = "El producto tiene que tener una descripcion")
   @NotEmpty(message = "La descripcion del producto no puede estar vacío")
-  @Size(max = 25, message = "El nombre del producto no puede tener menos de 4 caracteres ni más de 25")
+  @Size(max = 25, message = "El nombre del producto no puede superar los 25 caracteres")
   private String descripcion;
+
   @Min(value = 0, message = "Las existencias no pueden ser negativas")
-  private String existencias;
+  private int existencias;
+
   @Min(value = 0, message = "El precio no puede ser negativo")
   private BigDecimal precio;
+  
+  @NotNull(message = "La presentación del producto es requerida")
   @ManyToOne(fetch = FetchType.LAZY)
   private Presentacion presentacion;
 }
