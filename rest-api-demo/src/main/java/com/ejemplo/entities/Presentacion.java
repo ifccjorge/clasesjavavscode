@@ -2,6 +2,9 @@ package com.ejemplo.entities;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -45,5 +48,7 @@ public class Presentacion {
   private String descripcion;
   
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "presentacion")
+  @JsonIgnore
+  @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
   private List<Producto> productos;
 }
