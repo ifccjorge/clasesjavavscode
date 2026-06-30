@@ -50,6 +50,11 @@
             placeholder="su primer apellido aquí, por favor"
             required
           />
+          <p
+            th:if="${#fields.hasErrors('primerApellido')}"
+            th:errors="*{primerApellido}"
+            th:class="text-error"
+          ></p>
         </div>
         <div>
           <label for="segundoApellido">Segundo apellido:</label>
@@ -61,6 +66,11 @@
             value=""
             placeholder="su segundo apellido aquí, por favor"
           />
+          <p
+            th:if="${#fields.hasErrors('segundoApellido')}"
+            th:errors="*{segundoApellido}"
+            th:class="text-error"
+          ></p>
         </div>
         <div>
           <label for="fechaAlta">Fecha de alta:</label>
@@ -73,6 +83,11 @@
             placeholder="su fecha de alta aquí, por favor"
             required
           />
+          <p
+            th:if="${#fields.hasErrors('fechaAlta')}"
+            th:errors="*{fechaAlta}"
+            th:class="text-error"
+          ></p>
         </div>
         <div>
           <fieldset>
@@ -150,6 +165,7 @@
               id="telefonosFormulario"
               name="telefonosFormulario"
               placeholder="uno o varios separados por punto y coma, por favor"
+              th:value="empleado.telefonos.size() > 0 ? empleado.telefonos"
             ></textarea>
           </p>
         </div>

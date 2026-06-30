@@ -9,12 +9,14 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,8 +25,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ejemplo.entities.Correo;
 import com.ejemplo.entities.Empleado;
 import com.ejemplo.entities.Telefono;
+import com.ejemplo.services.CorreoService;
 import com.ejemplo.services.DepartamentoService;
 import com.ejemplo.services.EmpleadoService;
+import com.ejemplo.services.TelefonoService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +42,8 @@ public class EmpleadoController {
   private static final Logger LOG = Logger.getLogger("EmpleadoController");
   private final EmpleadoService empleadoService;
   private final DepartamentoService departamentoService;
+  private final CorreoService correoService;
+  private final TelefonoService telefonoService;
 
   @GetMapping("/listar")
   public String listarEmpleados(Model model) {
@@ -97,13 +103,41 @@ public class EmpleadoController {
         s -> Correo.builder().email(s.trim()).empleado(empleado).build())
         .collect(HashSet::new, HashSet::add, HashSet::addAll);
     empleado.setEmails(correos);
+    // Elimina teléfonos y correos existentes
+    if (empleado.getId() != 0) {
+      if (telefonoService.existsByEmpleado(empleado)) telefonoService.deleteByEmpleado(empleado);
+      if (correoService.existsByEmpleado(empleado)) correoService.deleteByEmpleado(empleado);
+    }
     // Graba empleado
     empleadoService.saveEmpleado(empleado);
     return "redirect:/empleados/listar";
   }
 
-  public String mostrarDetalles(Model model) {
-    
-    return "";
+  @GetMapping("/detalles/{id}")
+  public String mostrarDetalles(Model model, @PathVariable(name = "id", required = true) int empleado_id) {
+    model.addAttribute("empleado", empleadoService.getEmpleadoById(empleado_id));
+    return "detalles";
+  }
+
+	@GetMapping("/modificar/{id}")
+	public String updateEmpleado(Model model, @PathVariable(name = "id", required = true) int idEmpleado) {
+    Empleado empleado = empleadoService.getEmpleadoById(idEmpleado);
+    model.addAttribute("empleado", empleado);
+    model.addAttribute("departamentos", departamentoService.getAllDepartamentos());
+    Set<Telefono> telefonos = empleado.getTelefonos();
+    if (!telefonos.isEmpty()) {
+      String numerosTelefono = telefonos.stream()
+        .map(Telefono::getNumero)
+        .collect(Collectors.joining(Empleado.SEPARADOR));
+      model.addAttribute("numerosTelefono", numerosTelefono);
+    }
+    Set<Correo> correos = empleado.getEmails();
+    if (!correos.isEmpty()) {
+      String direccionesCorreos = correos.stream()
+          .map(correo -> correo.getEmail())
+          .collect(Collectors.joining(Empleado.SEPARADOR));
+      model.addAttribute("direccionesCorreos", direccionesCorreos);
+    }
+    return "formularioAltaModificacion";
   }
 }

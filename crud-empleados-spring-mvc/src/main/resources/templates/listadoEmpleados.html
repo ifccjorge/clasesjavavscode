@@ -7,7 +7,7 @@
   <body>
     <h1>Listado de empleados</h1>
     <div>
-      <a th:href="@{/empleados/alta}">Alta de un empleado</a>
+      <p><a th:href="@{/empleados/alta}">Alta de un empleado</a></p>
     </div>
     <table border="4" cellpadding="8" cellspacing="0">
       <thead>
@@ -28,7 +28,10 @@
           <td th:text="${empleado.salarioMoneda}"></td>
           <td th:text="${empleado.fechaFormateada}"></td>
           <td>
-            <a th:href="@{/empleados/details/}+${empleado.id}">Detalles</a>
+            <a th:href="@{/empleados/detalles/}+${empleado.id}">Detalles</a>
+          </td>
+          <td>
+            <a th:href="@{/empleados/modificar/}+${empleado.id}">Modificar</a>
           </td>
         </tr>
       </tbody>
