@@ -36,5 +36,9 @@
       <h2>Foto:</h2>
       <img th:src="@{/imagenes/}+${empleado.foto}" alt="Foto del Empleado" />
     </div>
+    <div>
+      <p><a th:href="@{/empleados/listar}">Listado de empleado</a></p>
+      <p><a th:href="@{/empleados/alta}">Alta de un empleado</a></p>
+    </div>
   </body>
 </html>

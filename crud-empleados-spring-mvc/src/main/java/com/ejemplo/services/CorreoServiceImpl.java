@@ -8,6 +8,7 @@ import com.ejemplo.dao.CorreoDao;
 import com.ejemplo.entities.Correo;
 import com.ejemplo.entities.Empleado;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -32,6 +33,7 @@ public class CorreoServiceImpl implements CorreoService {
     }
 
     @Override
+    @Transactional
     public void deleteByEmpleado(Empleado empleado) {
       correoDao.deleteByEmpleado(empleado);
     }

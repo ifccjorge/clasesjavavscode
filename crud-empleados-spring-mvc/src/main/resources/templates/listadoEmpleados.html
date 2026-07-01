@@ -18,6 +18,8 @@
         <th>Salario</th>
         <th>Fecha de alta</th>
         <th></th>
+        <th></th>
+        <th></th>
       </thead>
       <tbody>
         <tr th:each="empleado:${empleados}">
@@ -32,6 +34,9 @@
           </td>
           <td>
             <a th:href="@{/empleados/modificar/}+${empleado.id}">Modificar</a>
+          </td>
+          <td>
+            <a th:href="@{/empleados/eliminar/}+${empleado.id}">Eliminar</a>
           </td>
         </tr>
       </tbody>

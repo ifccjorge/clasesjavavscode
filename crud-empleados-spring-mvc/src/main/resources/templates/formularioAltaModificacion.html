@@ -148,7 +148,8 @@
           <p>
             <label for="correosFormulario">Correos:</label><br />
             <textarea
-              th:text="${correosSeparador}"
+              th:text="${empleado.correosSeparador}"
+              th:value="${empleado.correosSeparador}"
               rows="5"
               cols="40"
               id="correosFormulario"
@@ -159,13 +160,12 @@
           <p>
             <label for="telefonosFormulario">Teléfonos:</label><br />
             <textarea
-              th:text="${telefonosSeparador}"
+              th:text="${empleado.telefonosSeparador}"
               rows="5"
               cols="40"
               id="telefonosFormulario"
               name="telefonosFormulario"
               placeholder="uno o varios separados por punto y coma, por favor"
-              th:value="empleado.telefonos.size() > 0 ? empleado.telefonos"
             ></textarea>
           </p>
         </div>
@@ -177,6 +177,13 @@
             name="file"
             title="Selección de la imagen del empleado"
           />
+          <div th:if="${id != 0 and empleado.foto != null}">
+            <h4>Foto actual del empleado:</h4>
+            <img
+              th:src="@{/imagenes/}+${empleado.foto}"
+              alt="Foto del Empleado"
+            />
+          </div>
         </div>
         <input type="submit" value="Enviar" />
       </form>

@@ -28,7 +28,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -68,7 +68,7 @@ public class Empleado implements Serializable {
   private Genero genero;
 
   @DateTimeFormat(pattern = "yyyy-MM-dd")
-  @Past(message = "La fecha de alta no puede ser inferior a la fecha actual")
+  @PastOrPresent(message = "La fecha de alta no puede ser inferior a la fecha actual")
   private LocalDate fechaAlta;
   private BigDecimal salario;
 
@@ -76,10 +76,10 @@ public class Empleado implements Serializable {
   @JoinColumn(name = "departamento_id", nullable = false, foreignKey = @ForeignKey(name = "fk_empleado_departamento"))
   private Departamento departamento;
 
-  @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "empleado")
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "empleado")
   private Set<Telefono> telefonos;
   
-  @OneToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE }, mappedBy = "empleado")
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "empleado")
   private Set<Correo> emails;
 
   private String foto;
@@ -97,10 +97,10 @@ public class Empleado implements Serializable {
   }
 
   public String correosSeparador() {
-    return String.join(SEPARADOR, this.emails.stream().map(Correo::getEmail).toList());
+    return this.emails == null ? "" : String.join(SEPARADOR, this.emails.stream().map(Correo::getEmail).toList());
   }
 
   public String telefonosSeparador() {
-    return this.telefonos.stream().collect(Collectors.mapping(Telefono::getNumero, Collectors.joining(SEPARADOR)));
+    return this.telefonos == null ? "" : this.telefonos.stream().collect(Collectors.mapping(Telefono::getNumero, Collectors.joining(SEPARADOR)));
   }
 }

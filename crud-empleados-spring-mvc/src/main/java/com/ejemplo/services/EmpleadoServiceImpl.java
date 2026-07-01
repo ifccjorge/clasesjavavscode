@@ -22,7 +22,7 @@ public class EmpleadoServiceImpl implements EmpleadoService {
 
     @Override
     public Empleado getEmpleadoById(int id) {
-      return empleadoDao.findById(id).orElseThrow(() -> new RuntimeException(""));
+      return empleadoDao.findById(id).orElseThrow(() -> new RuntimeException("Empleado no encontrado con id: " + id));
     }
 
     @Override
@@ -37,7 +37,7 @@ public class EmpleadoServiceImpl implements EmpleadoService {
 
     @Override
     public void deleteEmpleado(Empleado empleado) {
-      empleadoDao.save(empleado);
+      empleadoDao.delete(empleado);
     }
 
     @Override

@@ -94,15 +94,19 @@ public class EmpleadoController {
     LOG.log(Level.INFO, "Teléfonos recibidos: {0}", telefonosFormulario);
     LOG.log(Level.INFO, "Correos recibidos: {0}", correosFormulario);
     // Incluye teléfonos
-    Set<Telefono> telefonos = Arrays.stream(telefonosFormulario.split(Empleado.SEPARADOR)).map(
-        s -> Telefono.builder().numero(s.trim()).empleado(empleado).build())
-        .collect(HashSet::new, HashSet::add, HashSet::addAll);
-    empleado.setTelefonos(telefonos);
+    if (!telefonosFormulario.isEmpty() && !telefonosFormulario.isBlank()) {
+      Set<Telefono> telefonos = Arrays.stream(telefonosFormulario.split(Empleado.SEPARADOR)).map(
+          s -> Telefono.builder().numero(s.trim()).empleado(empleado).build())
+          .collect(HashSet::new, HashSet::add, HashSet::addAll);
+      empleado.setTelefonos(telefonos);
+    }
     // Incluye correos
-    Set<Correo> correos = Arrays.stream(correosFormulario.split(Empleado.SEPARADOR)).map(
-        s -> Correo.builder().email(s.trim()).empleado(empleado).build())
-        .collect(HashSet::new, HashSet::add, HashSet::addAll);
-    empleado.setEmails(correos);
+    if (!correosFormulario.isEmpty() && !correosFormulario.isBlank()) {
+      Set<Correo> correos = Arrays.stream(correosFormulario.split(Empleado.SEPARADOR)).map(
+          s -> Correo.builder().email(s.trim()).empleado(empleado).build())
+          .collect(HashSet::new, HashSet::add, HashSet::addAll);
+      empleado.setEmails(correos);
+    }
     // Elimina teléfonos y correos existentes
     if (empleado.getId() != 0) {
       if (telefonoService.existsByEmpleado(empleado)) telefonoService.deleteByEmpleado(empleado);
@@ -124,6 +128,8 @@ public class EmpleadoController {
     Empleado empleado = empleadoService.getEmpleadoById(idEmpleado);
     model.addAttribute("empleado", empleado);
     model.addAttribute("departamentos", departamentoService.getAllDepartamentos());
+    model.addAttribute("tel", empleado.telefonosSeparador());
+    model.addAttribute("cor", empleado.correosSeparador());
     Set<Telefono> telefonos = empleado.getTelefonos();
     if (!telefonos.isEmpty()) {
       String numerosTelefono = telefonos.stream()
@@ -139,5 +145,23 @@ public class EmpleadoController {
       model.addAttribute("direccionesCorreos", direccionesCorreos);
     }
     return "formularioAltaModificacion";
+  }
+  
+  @GetMapping("/eliminar/{idEmpleado}")
+  public String deleteEmpleado(Model model, @PathVariable int idEmpleado) {
+    Empleado empleadoEliminar = empleadoService.getEmpleadoById(idEmpleado);
+    if (empleadoEliminar.getFoto() != null) {
+      Path rutaRelativa = Paths.get("src/main/resources/static/imagenes/" + empleadoEliminar.getFoto());
+      if (Files.exists(rutaRelativa)) {
+        try {
+          Files.delete(rutaRelativa);
+        } catch (IOException e) {
+          LOG.log(Level.SEVERE, "Error al eliminar la imagen del empleado: {0}", e.getMessage());
+          LOG.log(Level.FINE, "Detalle de la excepción al eliminar la imagen", e);
+        }
+      }
+    }
+    empleadoService.deleteEmpleado(empleadoEliminar);
+    return "redirect:/empleados/listar";
   }
 }
