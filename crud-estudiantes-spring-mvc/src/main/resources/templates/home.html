@@ -2,13 +2,17 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="es">
   <head>
     <meta charset="UTF-8" />
-    <title>Gestión de estudiantes</title>
+    <title>Gestión de universidad</title>
   </head>
   <body>
-    <h1>Presentación de la página de gestión de estudiantes</h1>
+    <h1>Presentación de la página de gestión de universidad</h1>
     <div>
       <p><a th:href="@{/estudiantes/listar}">Listado de estudiante</a></p>
       <p><a th:href="@{/estudiantes/alta}">Alta de un estudiante</a></p>
+    </div>
+    <div>
+      <p><a th:href="@{/profesores/listar}">Listado de profesores</a></p>
+      <p><a th:href="@{/profesores/alta}">Alta de un profesor</a></p>
     </div>
   </body>
 </html>

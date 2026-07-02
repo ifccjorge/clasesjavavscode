@@ -1,5 +1,6 @@
 package com.ejemplo;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.Set;
@@ -11,10 +12,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import com.ejemplo.entities.Correo;
 import com.ejemplo.entities.Estudiante;
 import com.ejemplo.entities.Facultad;
+import com.ejemplo.entities.Profesor;
 import com.ejemplo.entities.Telefono;
 import com.ejemplo.model.Genero;
 import com.ejemplo.services.EstudianteService;
 import com.ejemplo.services.FacultadService;
+import com.ejemplo.services.ProfesorService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -24,6 +27,7 @@ public class CrudEstudiantesSpringMvcApplication implements CommandLineRunner {
 
   private final EstudianteService estudianteService;
   private final FacultadService facultadService;
+  private final ProfesorService profesorService;
 
 	public static void main(String[] args) {
 		SpringApplication.run(CrudEstudiantesSpringMvcApplication.class, args);
@@ -79,6 +83,51 @@ public class CrudEstudiantesSpringMvcApplication implements CommandLineRunner {
     estudiante2.getTelefonos().forEach(correo -> correo.setEstudiante(estudiante2));
     estudianteService.saveEstudiante(estudiante1);
     estudianteService.saveEstudiante(estudiante2);
+
+    // EVALUACIÓN PRÁCTICA: 02/07/2026
+    // Profesores
+    Profesor profesor1 = Profesor.builder()
+      .nombre("Juan")
+      .primerApellido("Gómez")
+      .segundoApellido("Rodríguez")
+      .genero(Genero.HOMBRE)
+      .fechaAlta(LocalDate.of(2021, Month.APRIL, 12))
+      .salario(new BigDecimal(1700.25))
+      .foto("2636603.png")
+      .facultad(facultad1)
+      .build();
+    Profesor profesor2 = Profesor.builder()
+      .nombre("Luisa")
+      .primerApellido("Pérez")
+      .segundoApellido("Giménez")
+      .genero(Genero.MUJER)
+      .fechaAlta(LocalDate.of(2022, Month.JANUARY, 9))
+      .salario(new BigDecimal(1600.75))
+      .foto("4663261.png")
+      .facultad(facultad2)
+      .build();
+    Profesor profesor3 = Profesor.builder()
+      .nombre("Pablo")
+      .primerApellido("Sánchez")
+      .segundoApellido("Hernández")
+      .genero(Genero.HOMBRE)
+      .fechaAlta(LocalDate.of(2025, Month.NOVEMBER, 28))
+      .salario(new BigDecimal(1500.25))
+      .facultad(facultad3)
+      .build();
+    Profesor profesor4 = Profesor.builder()
+      .nombre("Ana")
+      .primerApellido("Torres")
+      .segundoApellido("Moreno")
+      .genero(Genero.OTRO)
+      .fechaAlta(LocalDate.of(2020, Month.OCTOBER, 27))
+      .salario(new BigDecimal(1100.75))
+      .facultad(facultad4)
+      .build();
+    profesorService.saveProfesor(profesor1);
+    profesorService.saveProfesor(profesor2);
+    profesorService.saveProfesor(profesor3);
+    profesorService.saveProfesor(profesor4);
 	}
 
 }

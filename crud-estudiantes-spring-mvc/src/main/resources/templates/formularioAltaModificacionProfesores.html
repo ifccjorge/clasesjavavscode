@@ -1,0 +1,143 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="" />
+    <title>Formulario alta/modificación de profesores</title>
+  </head>
+  <body>
+    <h1>Formulario alta/modificación de profesores</h1>
+    <fieldset>
+      <legend>Formulario de alta o modificación</legend>
+      <form
+        th:action="@{/profesores/persistir}"
+        method="post"
+        th:object="${profesor}"
+        enctype="multipart/form-data"
+      >
+        <input type="hidden" th:field="*{id}" />
+        <div>
+          <label for="nombre">Nombre:</label>
+          <input
+            th:field="*{nombre}"
+            type="text"
+            id="nombre"
+            name="nombre"
+            value=""
+            placeholder="su nombre aquí, por favor"
+            required
+          />
+        </div>
+        <div>
+          <label for="primerApellido">Primer apellido:</label>
+          <input
+            th:field="*{primerApellido}"
+            type="text"
+            id="primerApellido"
+            name="primerApellido"
+            value=""
+            placeholder="su primer apellido aquí, por favor"
+            required
+          />
+        </div>
+        <div>
+          <label for="segundoApellido">Segundo apellido:</label>
+          <input
+            th:field="*{segundoApellido}"
+            type="text"
+            id="segundoApellido"
+            name="segundoApellido"
+            value=""
+            placeholder="su segundo apellido aquí, por favor"
+          />
+        </div>
+        <div>
+          <label for="fechaAlta">Fecha de alta:</label>
+          <input
+            th:field="*{fechaAlta}"
+            type="date"
+            id="fechaAlta"
+            name="fechaAlta"
+            value=""
+            placeholder="su fecha de alta aquí, por favor"
+            required
+          />
+        </div>
+        <div>
+          <label for="salario">Salario:</label>
+          <input
+            th:field="*{salario}"
+            type="text"
+            id="salario"
+            name="salario"
+            value=""
+            placeholder="su segundo apellido aquí, por favor"
+          />
+        </div>
+        <div>
+          <fieldset>
+            <legend>Género</legend>
+            <label for="hombre">Hombre:</label>
+            <input
+              th:field="*{genero}"
+              type="radio"
+              name="genero"
+              id="hombre"
+              value="HOMBRE"
+              required
+            /><br />
+            <label for="mujer">Mujer:</label>
+            <input
+              th:field="*{genero}"
+              type="radio"
+              name="genero"
+              id="mujer"
+              value="MUJER"
+              required
+            /><br />
+            <label for="otro">Otro:</label>
+            <input
+              th:field="*{genero}"
+              type="radio"
+              name="genero"
+              id="otro"
+              value="OTRO"
+              required
+            /><br />
+          </fieldset>
+        </div>
+        <div>
+          <label for="facultad">Facultad:</label>
+          <select id="facultad" th:field="*{facultad}" required>
+            <option value=""></option>
+            <option
+              th:each="facultad:${facultades}"
+              th:value="${facultad.id}"
+              th:text="${facultad.nombre}"
+            ></option>
+          </select>
+        </div>
+        <div>
+          <label for="file">Foto del profesor</label>
+          <input
+            type="file"
+            id="file"
+            name="file"
+            title="Selección de la imagen del profesor"
+          />
+          <div th:if="${id != 0 and profesor.foto != null}">
+            <h4>Foto actual del profesor:</h4>
+            <img
+              th:src="@{/imagenes/}+${profesor.foto}"
+              alt="Foto del profesor"
+            />
+          </div>
+        </div>
+        <input type="submit" value="Enviar" />
+      </form>
+    </fieldset>
+    <div>
+      <p><a th:href="@{/profesores/listar}">Listado de profesores</a></p>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,45 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Gestión de profesores</title>
+  </head>
+  <body>
+    <h1>Listado de profesores</h1>
+    <div>
+      <p><a th:href="@{/profesores/alta}">Alta de un profesor</a></p>
+    </div>
+    <table border="3" cellpadding="6" cellspacing="0">
+      <thead>
+        <th>Nombre</th>
+        <th>Primer apellido</th>
+        <th>Segundo apellido</th>
+        <th>Género</th>
+        <th>Fecha de alta</th>
+        <th>Salario</th>
+        <th></th>
+        <th></th>
+        <th></th>
+      </thead>
+      <tbody>
+        <tr th:each="profesor:${profesores}">
+          <td th:text="${profesor.nombre}"></td>
+          <td th:text="${profesor.primerApellido}"></td>
+          <td th:text="${profesor.segundoApellido}"></td>
+          <td th:text="${profesor.genero.getGenero}"></td>
+          <td th:text="${profesor.fechaAlta}"></td>
+          <td th:text="${profesor.salario}"></td>
+          <td>
+            <a th:href="@{/profesores/detalles/}+${profesor.id}">Detalles</a>
+          </td>
+          <td>
+            <a th:href="@{/profesores/modificar/}+${profesor.id}">Modificar</a>
+          </td>
+          <td>
+            <a th:href="@{/profesores/eliminar/}+${profesor.id}">Eliminar</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>
