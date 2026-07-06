@@ -1,5 +1,6 @@
 package com.ejemplo.controllers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,14 +18,18 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ejemplo.entities.Producto;
+import com.ejemplo.models.FileUploadResponse;
 import com.ejemplo.services.ProductoService;
+import com.ejemplo.utilities.FileUploadUtil;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -32,13 +37,17 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/productos")
 @RequiredArgsConstructor
 public class ProductoController {
+
   private final ProductoService productoService;
+  private final FileUploadUtil fileUploadUtil;
+
   // Resultado no paginado: http://localhost:8080/productos/listado
   @GetMapping("/listado")
   public List<Producto> getProductos() {
     List<Producto> allProductos = productoService.findAll(Sort.by("id"));
     return allProductos;
   }
+
   // Resultado paginado: http://localhost:8080/productos?page=0&size=3
   @GetMapping
   public ResponseEntity<Map<String, Object>> getProductos(
@@ -87,11 +96,13 @@ public class ProductoController {
     return responseEntity;
   }
 
-  @PostMapping
+  @PostMapping(consumes = "multipart/form-data")
+  @Transactional
   public ResponseEntity<Map<String, Object>> saveProduct(
-    @Valid @RequestBody Producto producto,
-    BindingResult result
-  ) {
+    @Valid @RequestPart Producto producto,
+    BindingResult result,
+    @RequestPart(name = "file", required = false) MultipartFile imagenDelProducto
+  ) throws IOException {
     List<String> mensajesError = new ArrayList<>();
     Map<String, Object> responseMap = new HashMap<>();
     ResponseEntity<Map<String, Object>> responseEntity;
@@ -102,6 +113,16 @@ public class ProductoController {
       responseMap.put("Producto mal formado", producto);
       responseEntity = new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
       return responseEntity;
+    }
+    if (imagenDelProducto != null && !imagenDelProducto.isEmpty()) {
+      String fileCode = fileUploadUtil.saveFile(imagenDelProducto.getOriginalFilename(), imagenDelProducto);
+      producto.setProductoImage(fileCode + "-" + imagenDelProducto.getOriginalFilename());
+      FileUploadResponse fileUploadResponse = new FileUploadResponse(
+        fileCode + "-" + imagenDelProducto.getOriginalFilename(),
+        "/productos/fileDownload",
+        imagenDelProducto.getSize()
+      );
+      responseMap.put("Información de la imagen del producto", fileUploadResponse);
     }
     try {
       Producto productoPersistido = productoService.save(producto);

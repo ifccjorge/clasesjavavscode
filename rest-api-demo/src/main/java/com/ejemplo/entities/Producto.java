@@ -49,8 +49,10 @@ public class Producto {
 
   @Min(value = 0, message = "El precio no puede ser negativo")
   private BigDecimal precio;
-  
+
   @NotNull(message = "La presentación del producto es requerida")
   @ManyToOne(fetch = FetchType.LAZY)
   private Presentacion presentacion;
+
+  private String productoImage;
 }
