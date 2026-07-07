@@ -6,12 +6,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
@@ -27,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.ejemplo.entities.Producto;
 import com.ejemplo.models.FileUploadResponse;
 import com.ejemplo.services.ProductoService;
+import com.ejemplo.utilities.FileDownloadUtil;
 import com.ejemplo.utilities.FileUploadUtil;
 
 import jakarta.transaction.Transactional;
@@ -40,6 +44,7 @@ public class ProductoController {
 
   private final ProductoService productoService;
   private final FileUploadUtil fileUploadUtil;
+  private final FileDownloadUtil fileDownloadUtil;
 
   // Resultado no paginado: http://localhost:8080/productos/listado
   @GetMapping("/listado")
@@ -118,10 +123,9 @@ public class ProductoController {
       String fileCode = fileUploadUtil.saveFile(imagenDelProducto.getOriginalFilename(), imagenDelProducto);
       producto.setProductoImage(fileCode + "-" + imagenDelProducto.getOriginalFilename());
       FileUploadResponse fileUploadResponse = new FileUploadResponse(
-        fileCode + "-" + imagenDelProducto.getOriginalFilename(),
-        "/productos/fileDownload",
-        imagenDelProducto.getSize()
-      );
+          fileCode + "-" + imagenDelProducto.getOriginalFilename(),
+          "/productos/fileDownload/" + fileCode,
+          imagenDelProducto.getSize());
       responseMap.put("Información de la imagen del producto", fileUploadResponse);
     }
     try {
@@ -135,5 +139,25 @@ public class ProductoController {
       responseEntity = new ResponseEntity<>(responseMap, HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return responseEntity;
+  }
+
+  // Descargar imagen: http://localhost:8080/productos/fileDownload/hrUfluSx
+  @GetMapping("/fileDownload/{fileCode}")
+  public ResponseEntity<?> downloadFile(@PathVariable String fileCode) {
+    Resource resource;
+    try {
+      resource = fileDownloadUtil.getFileResource(fileCode);
+    } catch (IOException e) {
+      return ResponseEntity.internalServerError().build();
+    }
+    if (resource == null) {
+      return new ResponseEntity<>("Imagen del producto no encontrada", HttpStatus.NOT_FOUND);
+    }
+    String contentType = "application/octet-stream";
+    String headerValue = "attachment; fileName=\"" + resource.getFilename() + "\"";
+    return ResponseEntity.ok()
+      .contentType(MediaType.parseMediaType(contentType))
+      .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
+      .body(resource);
   }
 }

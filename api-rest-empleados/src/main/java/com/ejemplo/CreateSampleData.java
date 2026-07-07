@@ -12,7 +12,7 @@ import com.ejemplo.entities.Correo;
 import com.ejemplo.entities.Departamento;
 import com.ejemplo.entities.Empleado;
 import com.ejemplo.entities.Telefono;
-import com.ejemplo.model.Genero;
+import com.ejemplo.models.Genero;
 import com.ejemplo.services.CorreoService;
 import com.ejemplo.services.DepartamentoService;
 import com.ejemplo.services.EmpleadoService;

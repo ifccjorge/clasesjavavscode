@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.ejemplo.model.Genero;
+import com.ejemplo.models.Genero;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -80,4 +80,5 @@ public class Empleado implements Serializable {
   @Builder.Default
   private Set<Correo> emails = new HashSet<>();
 
+  private String imagenEmpleado;
 }

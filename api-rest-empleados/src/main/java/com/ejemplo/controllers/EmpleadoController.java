@@ -1,17 +1,22 @@
 package com.ejemplo.controllers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,10 +25,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.ejemplo.entities.Empleado;
+import com.ejemplo.models.FileUploadResponse;
 import com.ejemplo.services.EmpleadoService;
+import com.ejemplo.utilities.FileDownloadUtil;
+import com.ejemplo.utilities.FileUploadUtil;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,17 +43,19 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EmpleadoController {
   private final EmpleadoService empleadoService;
+  private final FileDownloadUtil fileDownloadUtil;
+  private final FileUploadUtil fileUploadUtil;
 
   // Resultado no paginado: http://localhost:8080/empleados/listado
   @GetMapping("/listado")
-  public List<Empleado> getProductos() {
+  public List<Empleado> getEmpleados() {
     List<Empleado> allEmpleados = empleadoService.findAll(Sort.by("id"));
     return allEmpleados;
   }
 
   // Resultado paginado: http://localhost:8080/empleados?page=0&size=3
   @GetMapping
-  public ResponseEntity<Map<String, Object>> getProductos(
+  public ResponseEntity<Map<String, Object>> getEmpleados(
     @RequestParam(required = false) Integer page,
     @RequestParam(required = false) Integer size
   ) {
@@ -61,7 +73,7 @@ public class EmpleadoController {
     return new ResponseEntity<>(responseMap, HttpStatus.OK);
   }
 
-  // Sólo un producto: http://localhost:8080/empleados/1
+  // Sólo un empleado: http://localhost:8080/empleados/1
   @GetMapping("/{id}")
   public ResponseEntity<Map<String, Object>> findProductById(
      @PathVariable(name = "id", required = true) int empleado_id
@@ -89,11 +101,13 @@ public class EmpleadoController {
     return responseEntity;
   }
 
-  @PostMapping
+  @PostMapping(consumes = "multipart/form-data")
+  @Transactional
   public ResponseEntity<Map<String, Object>> saveProduct(
     @Valid @RequestBody Empleado empleado,
-    BindingResult result
-  ) {
+    BindingResult result,
+    @RequestPart(name = "file", required = false) MultipartFile imagenDelEmpleado
+  ) throws IOException {
     List<String> mensajesError = new ArrayList<>();
     Map<String, Object> responseMap = new HashMap<>();
     ResponseEntity<Map<String, Object>> responseEntity;
@@ -104,6 +118,15 @@ public class EmpleadoController {
       responseMap.put("Empleado mal formado", empleado);
       responseEntity = new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
       return responseEntity;
+    }
+    if (imagenDelEmpleado != null && !imagenDelEmpleado.isEmpty()) {
+      String fileCode = fileUploadUtil.saveFile(imagenDelEmpleado.getOriginalFilename(), imagenDelEmpleado);
+      empleado.setImagenEmpleado(fileCode + "-" + imagenDelEmpleado.getOriginalFilename());
+      FileUploadResponse fileUploadResponse = new FileUploadResponse(
+          fileCode + "-" + imagenDelEmpleado.getOriginalFilename(),
+          "/empleado/fileDownload/" + fileCode,
+          imagenDelEmpleado.getSize());
+      responseMap.put("Información de la imagen del empleado", fileUploadResponse);
     }
     try {
       Empleado empleadoPersistido = empleadoService.save(empleado);
@@ -116,5 +139,25 @@ public class EmpleadoController {
       responseEntity = new ResponseEntity<>(responseMap, HttpStatus.INTERNAL_SERVER_ERROR);
     }
     return responseEntity;
+  }
+
+  // Descargar imagen: http://localhost:8080/empleados/fileDownload/hrUfluSx
+  @GetMapping("/fileDownload/{fileCode}")
+  public ResponseEntity<?> downloadFile(@PathVariable String fileCode) {
+    Resource resource;
+    try {
+      resource = fileDownloadUtil.getFileResource(fileCode);
+    } catch (IOException e) {
+      return ResponseEntity.internalServerError().build();
+    }
+    if (resource == null) {
+      return new ResponseEntity<>("Imagen del empleado no encontrada", HttpStatus.NOT_FOUND);
+    }
+    String contentType = "application/octet-stream";
+    String headerValue = "attachment; fileName=\"" + resource.getFilename() + "\"";
+    return ResponseEntity.ok()
+      .contentType(MediaType.parseMediaType(contentType))
+      .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
+      .body(resource);
   }
 }

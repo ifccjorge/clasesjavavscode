@@ -34,13 +34,13 @@ public class ProductoServiceImp implements ProductoService {
     }
 
     @Override
-    public Producto save(Producto product) {
-      return productoDao.save(product);
+    public Producto save(Producto producto) {
+      return productoDao.save(producto);
     }
 
     @Override
-    public void delete(Producto product) {
-      productoDao.delete(product);
+    public void delete(Producto producto) {
+      productoDao.delete(producto);
     }
 
     @Override

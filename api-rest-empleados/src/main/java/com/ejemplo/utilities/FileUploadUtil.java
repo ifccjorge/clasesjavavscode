@@ -6,8 +6,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.security.SecureRandom;
+import java.util.stream.Collectors;
 
-import org.apache.commons.text.RandomStringGenerator;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,11 +18,12 @@ public class FileUploadUtil {
     Path uploadPath = Paths.get("target", "files-upload");
     if (!Files.exists(uploadPath))
       Files.createDirectories(uploadPath);
-    RandomStringGenerator generator = new RandomStringGenerator.Builder()
-      .withinRange('0', 'z')
-      .filteredBy(Character::isLetterOrDigit)
-      .get();
-    String fileCode = generator.generate(8);
+    String caracteres = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    SecureRandom random = new SecureRandom();
+    String fileCode = random.ints(8, 0, caracteres.length())
+      .mapToObj(caracteres::charAt)
+      .map(Object::toString)
+      .collect(Collectors.joining());
     try (InputStream inputStream = multipartFile.getInputStream()) {
       Path destino = uploadPath.resolve(fileCode + "-" + multipartFile.getOriginalFilename());
       Files.copy(inputStream, destino, StandardCopyOption.REPLACE_EXISTING);
