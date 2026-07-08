@@ -21,6 +21,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -32,6 +33,7 @@ import com.ejemplo.models.FileUploadResponse;
 import com.ejemplo.services.ProductoService;
 import com.ejemplo.utilities.FileDownloadUtil;
 import com.ejemplo.utilities.FileUploadUtil;
+import com.ejemplo.utilities.FileUtil;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -45,6 +47,7 @@ public class ProductoController {
   private final ProductoService productoService;
   private final FileUploadUtil fileUploadUtil;
   private final FileDownloadUtil fileDownloadUtil;
+  private final FileUtil fileUtil;
 
   // Resultado no paginado: http://localhost:8080/productos/listado
   @GetMapping("/listado")
@@ -156,8 +159,60 @@ public class ProductoController {
     String contentType = "application/octet-stream";
     String headerValue = "attachment; fileName=\"" + resource.getFilename() + "\"";
     return ResponseEntity.ok()
-      .contentType(MediaType.parseMediaType(contentType))
-      .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
-      .body(resource);
+        .contentType(MediaType.parseMediaType(contentType))
+        .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
+        .body(resource);
   }
+
+  // Actualizar un empleado
+  @PutMapping(value = "/{id}", consumes = "multipart/form-data")
+  @Transactional
+  public ResponseEntity<Map<String, Object>> updateProduct(
+      @Valid @RequestPart Producto producto,
+      BindingResult result,
+      @RequestPart(name = "file", required = false) MultipartFile imagenDelProducto,
+      @PathVariable int id
+  ) throws IOException {
+    List<String> mensajesError = new ArrayList<>();
+    Map<String, Object> responseMap = new HashMap<>();
+    ResponseEntity<Map<String, Object>> responseEntity;
+    if (result.hasErrors()) {
+      List<ObjectError> objectErrors = result.getAllErrors();
+      objectErrors.stream().forEach(objectError -> mensajesError.add(objectError.getDefaultMessage()));
+      responseMap.put("El producto tiene los siguientes errores", mensajesError);
+      responseMap.put("Producto mal formado", producto);
+      responseEntity = new ResponseEntity<>(responseMap, HttpStatus.BAD_REQUEST);
+      return responseEntity;
+    }
+    Producto productoGuardado = productoService.findById(id);
+    if (productoGuardado == null) {
+      responseMap.put("mensaje de error", "producto con id " + id + " no encontrado");
+      return new ResponseEntity<>(responseMap, HttpStatus.NOT_FOUND);
+    }
+    if (imagenDelProducto != null && !imagenDelProducto.isEmpty()) {
+      if (productoGuardado.getProductoImage() != null) {
+        fileUtil.eliminarArchivo(productoGuardado.getProductoImage());
+      }
+      String fileCode = fileUploadUtil.saveFile(imagenDelProducto.getOriginalFilename(), imagenDelProducto);
+      producto.setProductoImage(fileCode + "-" + imagenDelProducto.getOriginalFilename());
+      FileUploadResponse fileUploadResponse = new FileUploadResponse(
+          fileCode + "-" + imagenDelProducto.getOriginalFilename(),
+          "/productos/fileDownload/" + fileCode,
+          imagenDelProducto.getSize());
+      responseMap.put("Información de la imagen del producto", fileUploadResponse);
+    }
+    try {
+      producto.setId(id);
+      Producto productoPersistido = productoService.save(producto);
+      responseMap.put("mensaje", "Producto actualizado exitosamente");
+      responseMap.put("Producto actualizado", productoPersistido);
+      responseEntity = new ResponseEntity<>(responseMap, HttpStatus.CREATED);
+    } catch (DataAccessException e) {
+      responseMap.put("Error grave", "No ha podido ser actualizado el producto y la causa más probable es "
+          + e.getMostSpecificCause().getMessage());
+      responseEntity = new ResponseEntity<>(responseMap, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    return responseEntity;
+  }
+
 }

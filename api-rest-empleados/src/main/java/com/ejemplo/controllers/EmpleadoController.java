@@ -16,7 +16,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,6 +34,7 @@ import com.ejemplo.services.EmpleadoService;
 import com.ejemplo.utilities.FileDownloadUtil;
 import com.ejemplo.utilities.FileUploadUtil;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -101,10 +101,50 @@ public class EmpleadoController {
     return responseEntity;
   }
 
+  // Enviar una lista de empleados (application/json)
+  @PostMapping(path = "/datos", consumes = "application/json")
+  public ResponseEntity<List<Map<String, Object>>> saveProduct(
+    @Valid @RequestBody List<Empleado> empleados,
+    BindingResult result
+  ) {
+    List<String> mensajesError = new ArrayList<>();
+    Map<String, Object> responseMap;
+    List<Map<String, Object>> responseListMap = new ArrayList<>();
+    ResponseEntity<List<Map<String, Object>>> responseEntity;
+    if (result.hasErrors()) {
+      List<ObjectError> objectErrors = result.getAllErrors();
+      for (ObjectError objectError : objectErrors) mensajesError.add(objectError.getDefaultMessage());
+      responseMap = new HashMap<>();
+      responseMap.put("Los empleados tienen los siguientes errores", mensajesError);
+      responseMap.put("Empleados mal formados", empleados);
+      responseListMap.add(responseMap);
+      responseEntity = new ResponseEntity<>(responseListMap, HttpStatus.BAD_REQUEST);
+      return responseEntity;
+    }
+    try {
+      for (Empleado empleado : empleados) {
+        Empleado empleadoPersistido = empleadoService.save(empleado);
+        responseMap = new HashMap<>();
+        responseMap.put("mensaje", "Empleado persistido exitosamente");
+        responseMap.put("Empleado persistido", empleadoPersistido);
+        responseListMap.add(responseMap);
+      }
+      responseEntity = new ResponseEntity<>(responseListMap, HttpStatus.CREATED);
+    } catch (DataAccessException e) {
+      responseMap = new HashMap<>();
+      responseMap.put("Error grave", "No ha podido ser guardada la lista de empleados y la causa más probable es "
+          + e.getMostSpecificCause().getMessage());
+      responseListMap.add(responseMap);
+      responseEntity = new ResponseEntity<>(responseListMap, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    return responseEntity;
+  }
+
+  // Enviar empleado (application/json) con imagen (application/octet-stream)
   @PostMapping(consumes = "multipart/form-data")
   @Transactional
   public ResponseEntity<Map<String, Object>> saveProduct(
-    @Valid @RequestBody Empleado empleado,
+    @Valid @RequestPart Empleado empleado,
     BindingResult result,
     @RequestPart(name = "file", required = false) MultipartFile imagenDelEmpleado
   ) throws IOException {
@@ -124,7 +164,7 @@ public class EmpleadoController {
       empleado.setImagenEmpleado(fileCode + "-" + imagenDelEmpleado.getOriginalFilename());
       FileUploadResponse fileUploadResponse = new FileUploadResponse(
           fileCode + "-" + imagenDelEmpleado.getOriginalFilename(),
-          "/empleado/fileDownload/" + fileCode,
+          "/empleados/fileDownload/" + fileCode,
           imagenDelEmpleado.getSize());
       responseMap.put("Información de la imagen del empleado", fileUploadResponse);
     }

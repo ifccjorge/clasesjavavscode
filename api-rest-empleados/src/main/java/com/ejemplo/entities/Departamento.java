@@ -39,7 +39,7 @@ public class Departamento implements Serializable {
 
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, mappedBy = "departamento")
   @JsonIgnore
-  @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+  @JsonIgnoreProperties(ignoreUnknown = true, value = { "hibernateLazyInitializer", "handler" })
   private List<Empleado> empleados;
   
 }

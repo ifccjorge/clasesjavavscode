@@ -20,7 +20,7 @@ public class FileDownloadUtil {
         .findFirst()
         .get();
     } catch (IOException ioe) {
-      throw new IOException("Error fatal bucando el fichero ", ioe);
+      throw new IOException("Error fatal buscando el fichero ", ioe);
     }
     if (foundFile != null)
       return new UrlResource(foundFile.toUri());

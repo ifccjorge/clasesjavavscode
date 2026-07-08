@@ -45,7 +45,7 @@ public class Telefono implements Serializable {
     foreignKey = @ForeignKey(name = "fk_telefono_empleado")
   )
   @JsonIgnore
-  @JsonIgnoreProperties({ "hibernateLazyInitializer", "handler" })
+  @JsonIgnoreProperties(ignoreUnknown = true, value = { "hibernateLazyInitializer", "handler" })
   private Empleado empleado;
   
 }
