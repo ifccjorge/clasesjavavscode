@@ -42,6 +42,9 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/empleados")
 @RequiredArgsConstructor
 public class EmpleadoController {
+  
+  private final static String ID = "id";
+  private final static String NOMBRE = "nombre";
   private final EmpleadoService empleadoService;
   private final FileDownloadUtil fileDownloadUtil;
   private final FileUploadUtil fileUploadUtil;
@@ -49,7 +52,7 @@ public class EmpleadoController {
   // Resultado no paginado: http://localhost:8080/empleados/listado
   @GetMapping("/listado")
   public List<Empleado> getEmpleados() {
-    List<Empleado> allEmpleados = empleadoService.findAll(Sort.by("id"));
+    List<Empleado> allEmpleados = empleadoService.findAll(Sort.by(ID));
     return allEmpleados;
   }
 
@@ -61,7 +64,7 @@ public class EmpleadoController {
   ) {
     List<Empleado> empleados;
     Map<String, Object> responseMap = new HashMap<>();
-    Sort sort = Sort.by("nombre");
+    Sort sort = Sort.by(NOMBRE);
     if (page != null && size != null) {
       Pageable pageable = PageRequest.of(page, size, sort);
       Page<Empleado> empleadoPaginados = empleadoService.findAll(pageable);

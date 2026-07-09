@@ -29,6 +29,7 @@ public class CreateSampleData {
   ) {
     return args -> {
       // Departamentos
+      departamentoService.save(Departamento.builder().nombre("Sin departamento").build());
       departamentoService.save(Departamento.builder().nombre("RRHH").build());
       departamentoService.save(Departamento.builder().nombre("IT").build());
       departamentoService.save(Departamento.builder().nombre("Marketing").build());

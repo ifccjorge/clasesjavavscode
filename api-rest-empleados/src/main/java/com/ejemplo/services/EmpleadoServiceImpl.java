@@ -9,9 +9,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.ejemplo.dao.CorreoDao;
+import com.ejemplo.dao.DepartamentoDao;
 import com.ejemplo.dao.EmpleadoDao;
 import com.ejemplo.dao.TelefonoDao;
 import com.ejemplo.entities.Correo;
+import com.ejemplo.entities.Departamento;
 import com.ejemplo.entities.Empleado;
 import com.ejemplo.entities.Telefono;
 
@@ -22,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 public class EmpleadoServiceImpl implements EmpleadoService {
 
   private final EmpleadoDao empleadoDao;
+  private final DepartamentoDao departamentoDao;
   private final TelefonoDao telefonoDao;
   private final CorreoDao correoDao;
   
@@ -42,6 +45,15 @@ public class EmpleadoServiceImpl implements EmpleadoService {
 
   @Override
   public Empleado save(Empleado empleado) {
+    // Departamentos
+    Departamento departamento = empleado.getDepartamento();
+    Departamento departamentoBuscado;
+    if (departamento == null) {
+      departamentoBuscado = departamentoDao.findById(1).orElseThrow(() -> new RuntimeException("No existe el departamento no asignado"));
+      empleado.setDepartamento(departamentoBuscado);
+    } else {
+      departamentoBuscado = departamentoDao.findById(departamento.getId()).orElseThrow(() -> new RuntimeException("No existe el departamento no asignado"));
+    }
     // Obtención de teléfonos y correos del empleado
     Set<Telefono> telefonos = empleado.getTelefonos();
     Set<Correo> correos = empleado.getEmails();
@@ -51,16 +63,19 @@ public class EmpleadoServiceImpl implements EmpleadoService {
     // Empleado guardado
     Empleado empleadoPersistido = empleadoDao.save(empleado);
     // Teléfonos guardados
-    for (Telefono telefono : telefonos) {
-      telefono.setEmpleado(empleadoPersistido);
-      telefonoDao.save(telefono);
-    }
+    if (telefonos != null)
+      for (Telefono telefono : telefonos) {
+        telefono.setEmpleado(empleadoPersistido);
+        telefonoDao.save(telefono);
+      }
     // Correos guardados
-    for (Correo correo : correos) {
-      correo.setEmpleado(empleadoPersistido);
-      correoDao.save(correo);
+    if (correos != null)
+      for (Correo correo : correos) {
+        correo.setEmpleado(empleadoPersistido);
+        correoDao.save(correo);
     }
     // Incluye teléfonos y correos en el empleado
+    empleadoPersistido.setDepartamento(departamentoBuscado);
     empleadoPersistido.setTelefonos(telefonos);
     empleadoPersistido.setEmails(correos);
     return empleadoPersistido;

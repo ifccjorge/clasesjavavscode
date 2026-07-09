@@ -18,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -44,6 +45,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ProductoController {
 
+  private final static String ID = "id";
+  private final static String NAME = "name";
+
   private final ProductoService productoService;
   private final FileUploadUtil fileUploadUtil;
   private final FileDownloadUtil fileDownloadUtil;
@@ -52,7 +56,7 @@ public class ProductoController {
   // Resultado no paginado: http://localhost:8080/productos/listado
   @GetMapping("/listado")
   public List<Producto> getProductos() {
-    List<Producto> allProductos = productoService.findAll(Sort.by("id"));
+    List<Producto> allProductos = productoService.findAll(Sort.by(ID));
     return allProductos;
   }
 
@@ -64,7 +68,7 @@ public class ProductoController {
   ) {
     List<Producto> productos;
     Map<String, Object> responseMap = new HashMap<>();
-    Sort sort = Sort.by("nombre");
+    Sort sort = Sort.by(NAME);
     if (page != null && size != null) {
       Pageable pageable = PageRequest.of(page, size, sort);
       Page<Producto> productosPaginados = productoService.findAll(pageable);
@@ -104,6 +108,7 @@ public class ProductoController {
     return responseEntity;
   }
 
+  // Sólo un producto (application/json) con imagen (application/octet-stream): http://localhost:8080/productos
   @PostMapping(consumes = "multipart/form-data")
   @Transactional
   public ResponseEntity<Map<String, Object>> saveProduct(
@@ -164,7 +169,7 @@ public class ProductoController {
         .body(resource);
   }
 
-  // Actualizar un empleado
+  // Actualizar un empleado: http://localhost:8080/productos/1
   @PutMapping(value = "/{id}", consumes = "multipart/form-data")
   @Transactional
   public ResponseEntity<Map<String, Object>> updateProduct(
@@ -188,11 +193,12 @@ public class ProductoController {
     if (productoGuardado == null) {
       responseMap.put("mensaje de error", "producto con id " + id + " no encontrado");
       return new ResponseEntity<>(responseMap, HttpStatus.NOT_FOUND);
-    }
-    if (imagenDelProducto != null && !imagenDelProducto.isEmpty()) {
+    } else {
       if (productoGuardado.getProductoImage() != null) {
         fileUtil.eliminarArchivo(productoGuardado.getProductoImage());
       }
+    }
+    if (imagenDelProducto != null && !imagenDelProducto.isEmpty()) {
       String fileCode = fileUploadUtil.saveFile(imagenDelProducto.getOriginalFilename(), imagenDelProducto);
       producto.setProductoImage(fileCode + "-" + imagenDelProducto.getOriginalFilename());
       FileUploadResponse fileUploadResponse = new FileUploadResponse(
@@ -215,4 +221,30 @@ public class ProductoController {
     return responseEntity;
   }
 
+  // Eliminación de un producto: http://localhost:8080/productos/1
+  @DeleteMapping("/{id}")
+  @Transactional
+  public ResponseEntity<Map<String, Object>> deleteProducto(@PathVariable Integer id) {
+    ResponseEntity<Map<String, Object>> responseEntity;
+    var responseMap = new HashMap<String, Object>();
+    try {
+      Producto productoDelete = productoService.findById(id);
+      if (productoDelete != null ) {
+        if (productoDelete.getProductoImage() != null) {
+          fileUtil.eliminarArchivo(productoDelete.getProductoImage());
+        }
+        productoService.delete(productoDelete);
+        responseMap.put("mensaje", "El producto con id " + id + " ha sido eliminado");
+        responseEntity = new ResponseEntity<>(responseMap, HttpStatus.OK);
+      } else {
+        responseMap.put("mensaje", "El producto con id " + id + " no se ha encontrado");
+        responseEntity = new ResponseEntity<>(responseMap, HttpStatus.NOT_FOUND);
+      }
+    } catch (DataAccessException e) {
+        String errorMessage = "No ha podido ser eliminado el producto cuyo id es: " + id + ", siendo la causa mas probable: " + e.getMostSpecificCause().getMessage();
+        responseMap.put("mensaje", errorMessage);
+        responseEntity = new ResponseEntity<>(responseMap, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    return responseEntity;
+  }
 }
