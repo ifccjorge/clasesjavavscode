@@ -78,7 +78,6 @@ public class Tutorial implements Serializable {
         )
       }
   )
-  @JsonIgnore
   private Set<Tag> tags = new HashSet<>();
 
   @Builder.Default

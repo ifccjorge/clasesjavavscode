@@ -2,6 +2,10 @@ package com.ejemplo.entity;
 
 import java.io.Serializable;
 
+import org.hibernate.annotations.ColumnDefault;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -36,5 +40,7 @@ public class TutorialTag implements Serializable {
   @JoinColumn(name = "tag_id")
   private Tag tag;
 
+  @ColumnDefault("0")
+  @JsonIgnore
   private int rating;
 }

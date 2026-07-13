@@ -47,10 +47,9 @@ public class Tag implements Serializable {
   @JsonProperty("name")
   private String nombre;
 
-  @Builder.Default
   @ManyToMany(fetch = FetchType.LAZY, mappedBy = "tags")
   @JsonIgnore
-  private Set<Tutorial> tutorials = new HashSet<>();
+  private final Set<Tutorial> tutorials = new HashSet<>();
 
   @Builder.Default
   @OneToMany(mappedBy = "tag")
