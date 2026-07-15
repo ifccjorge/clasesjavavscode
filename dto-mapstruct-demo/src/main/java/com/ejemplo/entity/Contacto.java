@@ -2,6 +2,8 @@ package com.ejemplo.entity;
 
 import java.io.Serializable;
 
+import jakarta.persistence.Access;
+import jakarta.persistence.AccessType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,6 +17,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "contacts")
+@Access(AccessType.FIELD)
 @NoArgsConstructor
 @AllArgsConstructor
 @Data

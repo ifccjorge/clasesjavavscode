@@ -1,7 +1,9 @@
 package com.ejemplo.service;
 
-import com.ejemplo.dto.UsuarioResponse;
+import com.ejemplo.dto.UsuarioResponseDto;
+import com.ejemplo.entity.Usuario;
 
 public interface UsuarioService {
-  UsuarioResponse getUsuarioById(long id);
+  UsuarioResponseDto getUsuarioById(long id);
+  void save(Usuario usuario);
 }

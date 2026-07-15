@@ -3,6 +3,8 @@ package com.ejemplo.entity;
 import java.io.Serializable;
 import java.time.LocalDate;
 
+import jakarta.persistence.Access;
+import jakarta.persistence.AccessType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,6 +17,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "users")
+@Access(AccessType.FIELD)
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
