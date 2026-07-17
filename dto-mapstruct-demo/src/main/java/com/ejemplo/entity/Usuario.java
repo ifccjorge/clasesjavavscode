@@ -21,6 +21,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -59,6 +60,7 @@ public class Usuario implements Serializable {
         )
       }
   )
+  @EqualsAndHashCode.Exclude
   private Set<Contacto> contactos = new HashSet<>();
   
   public void addContacto(Contacto contacto) {

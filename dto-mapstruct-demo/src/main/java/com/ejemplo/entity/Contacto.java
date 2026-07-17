@@ -43,4 +43,9 @@ public class Contacto implements Serializable {
   @ManyToMany(fetch = FetchType.LAZY, mappedBy = "contactos")
   @JsonIgnore
   private Set<Usuario> usuarios = new HashSet<>();
+
+  // Copia objeto
+  public Contacto(Contacto contacto) {
+    this(contacto.userId, contacto.mobileNumber, contacto.email, contacto.usuarios);
+  }
 }

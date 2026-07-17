@@ -1,5 +1,8 @@
 package com.ejemplo.service;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -21,18 +24,34 @@ public interface UsuarioMapper {
   @Mapping(source = "contacto.email", target = "emailIdDto")
   UsuarioResponseDto mapUsuarioToUsuarioResponseDtoDemo(Usuario usuario, Contacto contacto);
 
-  @Mapping(source = "usuario.id", target = "idDto")
-  @Mapping(source = "usuario.username", target = "nameDto")
-  @Mapping(source = "usuario.password", target = "passwordDto", ignore = true)
-  @Mapping(source = "usuario.dateOfBirth", target = "dobDto")
-  @Mapping(source = "usuario.status", target = "statusDto", defaultValue = "INACTIVE")
-  @Mapping(source = "usuario.contactos", target = "contactosDto")
-  UsuarioContactoResponseDto mapUsuarioToUsuarioResponseDto(Usuario usuario);
-
   // Enmascaramiento
   @Named("maskPhone")
   static String getPhoneNumber(String phone) {
     if (phone.length() <= 4) return phone;
     return "****" + phone.substring(phone.length() - 4);
   }
+
+  @Mapping(source = "usuario.id", target = "idDto")
+  @Mapping(source = "usuario.username", target = "nameDto")
+  @Mapping(source = "usuario.password", target = "passwordDto", ignore = true)
+  @Mapping(source = "usuario.dateOfBirth", target = "dobDto")
+  @Mapping(source = "usuario.status", target = "statusDto", defaultValue = "INACTIVE")
+  @Mapping(source = "usuario.contactos", target = "contactosDto", qualifiedByName = "maskContacto")
+  UsuarioContactoResponseDto mapUsuarioToUsuarioResponseDto(Usuario usuario);
+
+  // Enmascaramiento
+  @Named("maskContacto")
+  static Set<Contacto> getMaskContacto(Set<Contacto> contactos) {
+    Set<Contacto> maskContactos = new HashSet<>();
+    for (Contacto contacto : contactos) {
+      Contacto maskContacto = new Contacto(contacto);
+      String telefono = maskContacto.getMobileNumber();
+      if (telefono.length() > 4) {
+        maskContacto.setMobileNumber("****" + telefono.substring(telefono.length() - 4));
+      }
+      maskContactos.add(maskContacto);
+    }
+    return maskContactos;
+  }
+
 }
