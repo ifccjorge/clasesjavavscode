@@ -17,7 +17,7 @@ import com.ejemplo.application.port.in.GetTaskUseCase;
 import com.ejemplo.application.port.in.ListTaskUseCase;
 import com.ejemplo.domain.model.Task;
 import com.ejemplo.infrastructure.adapter.in.rest.dto.CreateTaskRequest;
-import com.ejemplo.infrastructure.adapter.in.rest.dto.TaskResponse;
+import com.ejemplo.infrastructure.adapter.in.rest.dto.TaskResponseDto;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,25 +30,25 @@ public class TaskController {
   private final GetTaskUseCase getTaskUseCase;
   private final ListTaskUseCase listTaskUseCase;
   @PostMapping
-  public ResponseEntity<TaskResponse> create(@Valid @RequestBody CreateTaskRequest request) {
+  public ResponseEntity<TaskResponseDto> create(@Valid @RequestBody CreateTaskRequest request) {
     Task task = Task.builder()
         .title(request.getTitle())
         .description(request.getDescription())
         .build();
     Task saved = createTaskUseCase.create(task);
-    return ResponseEntity.status(HttpStatus.CREATED).body(TaskResponse.from(saved));
+    return ResponseEntity.status(HttpStatus.CREATED).body(TaskResponseDto.from(saved));
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<TaskResponse> getById(@PathVariable long id) {
+  public ResponseEntity<TaskResponseDto> getById(@PathVariable long id) {
     Task task = getTaskUseCase.getById(id);
-    return ResponseEntity.ok(TaskResponse.from(task));
+    return ResponseEntity.ok(TaskResponseDto.from(task));
   }
 
   @GetMapping
-  public ResponseEntity<List<TaskResponse>> listAll() {
-    List<TaskResponse> response = listTaskUseCase.findAll().stream()
-      .map(TaskResponse::from)
+  public ResponseEntity<List<TaskResponseDto>> listAll() {
+    List<TaskResponseDto> response = listTaskUseCase.findAll().stream()
+      .map(TaskResponseDto::from)
       .collect(Collectors.toList());
     return ResponseEntity.ok(response);
   }
