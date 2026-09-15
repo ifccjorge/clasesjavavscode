@@ -5,10 +5,6 @@ import java.time.LocalDateTime;
 import com.ejemplo.domain.model.Task;
 import com.ejemplo.domain.model.TaskStatus;
 
-//import lombok.Builder;
-//import lombok.Getter;
-//import lombok.Setter;
-
 public record TaskResponseDto(
   long idDto,
   String titleDto,

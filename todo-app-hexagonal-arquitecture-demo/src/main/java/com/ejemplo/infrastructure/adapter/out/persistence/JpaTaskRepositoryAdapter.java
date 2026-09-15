@@ -14,17 +14,17 @@ import lombok.RequiredArgsConstructor;
 @Repository
 @RequiredArgsConstructor
 public class JpaTaskRepositoryAdapter implements TaskRepositoryPort {
-	
-	private final SpringDataTaskRepository springDataTaskRepository;
-	private final TaskPersintenceMapper mapper;
+
+  private final SpringDataTaskRepository springDataTaskRepository;
+  private final TaskPersintenceMapper mapper;
 
 	@Override
-	public Task save(Task task) {
-		task.initDefaults();
-		TaskJpaEntity entity = mapper.toJpaEntity(task);
-		TaskJpaEntity saved = springDataTaskRepository.save(entity);
-		return mapper.toDomain(saved);
-	}
+  public Task save(Task task) {
+    task.initDefaults();
+    TaskJpaEntity entity = mapper.toJpaEntity(task);
+    TaskJpaEntity saved = springDataTaskRepository.save(entity);
+    return mapper.toDomain(saved);
+  }
 
   @Override
   public Optional<Task> findById(long id) {
@@ -36,6 +36,15 @@ public class JpaTaskRepositoryAdapter implements TaskRepositoryPort {
     return springDataTaskRepository.findAll().stream()
       .map(mapper::toDomain)
       .collect(Collectors.toList());
+  }
+
+  @Override
+  public void delete(long id) {
+    Task task = findById(id).get();
+    TaskJpaEntity entity = mapper.toJpaEntity(task);
+    //TaskJpaEntity deleted = springDataTaskRepository.findById(task.getId()).get();
+    springDataTaskRepository.delete(entity);
+    //return mapper.toDomain(deleted);
   }
 
 }

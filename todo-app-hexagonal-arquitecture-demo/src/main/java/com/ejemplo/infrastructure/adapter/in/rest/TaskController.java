@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ejemplo.application.port.in.CreateTaskUseCase;
+import com.ejemplo.application.port.in.DeleteTaskUseCase;
 import com.ejemplo.application.port.in.GetTaskUseCase;
 import com.ejemplo.application.port.in.ListTaskUseCase;
 import com.ejemplo.domain.model.Task;
@@ -27,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TaskController {
   private final CreateTaskUseCase createTaskUseCase;
+  private final DeleteTaskUseCase deleteTaskUseCase;
   private final GetTaskUseCase getTaskUseCase;
   private final ListTaskUseCase listTaskUseCase;
   @PostMapping
@@ -48,8 +51,15 @@ public class TaskController {
   @GetMapping
   public ResponseEntity<List<TaskResponseDto>> listAll() {
     List<TaskResponseDto> response = listTaskUseCase.findAll().stream()
-      .map(TaskResponseDto::from)
-      .collect(Collectors.toList());
+        .map(TaskResponseDto::from)
+        .collect(Collectors.toList());
     return ResponseEntity.ok(response);
   }
+
+  @DeleteMapping("/{id}")
+  public ResponseEntity<TaskResponseDto> deleteById(@PathVariable long id) {
+    Task task = deleteTaskUseCase.delete(id);
+    return ResponseEntity.status(HttpStatus.ACCEPTED).body(TaskResponseDto.from(task));
+  }
+
 }
