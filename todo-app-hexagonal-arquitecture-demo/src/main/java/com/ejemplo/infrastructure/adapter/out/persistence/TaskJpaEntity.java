@@ -31,28 +31,31 @@ public class TaskJpaEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
-	
+
 	@Column(nullable = false)
 	private String title;
-	
+
   @Column(nullable = false)
 	private String description;
-	
+
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 20)
 	private TaskStatus status;
-	
+
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;
-	
+
 	@Column(name = "completed_at")
 	private LocalDateTime completedAt;
-	
+
+	@Column(name = "image_path")
+	private String imagePath;
+
 	@PrePersist
 	public void prePersist() {
 		this.createdAt = LocalDateTime.now();
-		
 		if (this.status == null)
 			this.status = TaskStatus.PENDING;
 	}
+
 }

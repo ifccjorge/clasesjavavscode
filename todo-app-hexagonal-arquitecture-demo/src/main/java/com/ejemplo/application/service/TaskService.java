@@ -3,20 +3,19 @@ package com.ejemplo.application.service;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
 import com.ejemplo.application.port.in.CreateTaskUseCase;
 import com.ejemplo.application.port.in.DeleteTaskUseCase;
 import com.ejemplo.application.port.in.GetTaskUseCase;
 import com.ejemplo.application.port.in.ListTaskUseCase;
+import com.ejemplo.application.port.in.UpdateTaskUseCase;
+import com.ejemplo.application.port.in.UploadTaskImageUseCase;
+import com.ejemplo.application.port.out.FileStoragePort;
 import com.ejemplo.application.port.out.TaskRepositoryPort;
 import com.ejemplo.domain.exception.TaskNotFoundException;
 import com.ejemplo.domain.model.Task;
 
 import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
-@Service
 /* ¿Es correcta una anotacion de Spring aqui? 
  * 
  * Los mas puristas dirian que NO, pero tiene un coste implementar esto
@@ -34,9 +33,12 @@ import lombok.RequiredArgsConstructor;
  * hay que crear cuando se levanta el contexto de Spring
  * 
  * */
-public class TaskService implements CreateTaskUseCase, GetTaskUseCase, ListTaskUseCase, DeleteTaskUseCase {
+// Se omite @Service
+@RequiredArgsConstructor
+public class TaskService implements CreateTaskUseCase, DeleteTaskUseCase, GetTaskUseCase, ListTaskUseCase, UpdateTaskUseCase, UploadTaskImageUseCase {
 
 	private final TaskRepositoryPort taskRepositoryPort;
+	private final FileStoragePort fileStoragePort;
 	
 	@Override
 	public Task create(Task task) {
@@ -54,8 +56,29 @@ public class TaskService implements CreateTaskUseCase, GetTaskUseCase, ListTaskU
   }
 
 	@Override
-	public Task delete(long id) {
-		return taskRepositoryPort.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
+	public void deleteById(long id) {
+		Task task = taskRepositoryPort.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
+		taskRepositoryPort.deleteById(id);
+		fileStoragePort.delete(task.imagePath());
+	}
+
+	@Override
+	public Task update(long id, Task task) {
+		Task foundedTask = taskRepositoryPort.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
+		foundedTask.update(task.title(), task.description());
+		foundedTask.changeStatusTo(task.status());
+		return taskRepositoryPort.save(foundedTask);
+	}
+
+	@Override
+	public Task uploadImage(long id, String fileName, byte[] content) {
+		Task task = taskRepositoryPort.findById(id).orElseThrow(() -> new TaskNotFoundException(id));
+		String previousImage = task.imagePath();
+		String imagePath = fileStoragePort.store(fileName, content);
+		task.attachImage(imagePath);
+		Task saved = taskRepositoryPort.save(task);
+		fileStoragePort.delete(previousImage);
+		return saved;
 	}
 
 }
