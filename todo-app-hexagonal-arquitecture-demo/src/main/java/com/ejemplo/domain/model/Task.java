@@ -23,14 +23,12 @@ public record Task(
     if (status == TaskStatus.COMPLETED)
       throw new IllegalStateException("la tarea ya estaba completa");
     return new Task(id, title, description, TaskStatus.COMPLETED, createdAt, LocalDateTime.now(), imagePath);
-
   }
 
   public Task reopen() {
     if (status == TaskStatus.PENDING)
       throw new IllegalStateException("la tarea ya estaba pendiente");
     return new Task(id, title, description, TaskStatus.PENDING, createdAt, null, imagePath);
-
   }
 
   public Task changeStatusTo(TaskStatus newStatus) {

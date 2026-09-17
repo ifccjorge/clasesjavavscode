@@ -17,7 +17,7 @@ public class FileSystemStorageAdapter implements FileStoragePort {
   private final Path uploadsDir;
 
   public FileSystemStorageAdapter(@Value("${app.uploads.dir}") String uploadsDir) {
-      this.uploadsDir = Path.of(uploadsDir);
+    this.uploadsDir = Path.of(uploadsDir);
   }
 
   @Override
@@ -35,23 +35,25 @@ public class FileSystemStorageAdapter implements FileStoragePort {
   // El nombre original no se emplea en la ruta sólo se conserva la extensión si es alfanumérica.
 
   private String extensionOf(String fileName) {
-      if (fileName == null)
-          return "";
+    String s = "";
+    if (fileName != null) {
       int dot = fileName.lastIndexOf('.');
-      if (dot < 0)
-          return "";
-      String extension = fileName.substring(dot + 1);
-      return extension.matches("[A-Za-z0-9]{1,5}") ? "." + extension.toLowerCase() : "";
+      if (dot >= 0) {
+        String extension = fileName.substring(dot + 1);
+        s = extension.matches("[A-Za-z0-9]{1,5}") ? "." + extension.toLowerCase() : "";
+      }
+    }
+    return s;
   }
 
   @Override
   public void delete(String storedName) {
-    if (storedName == null)
-      return;
-    try {
-      Files.deleteIfExists(uploadsDir.resolve(storedName));
-    } catch (IOException e) {
-      throw new UncheckedIOException("No se pudo borrar la imagen de la tarea", e);
+    if (storedName != null) {
+      try {
+        Files.deleteIfExists(uploadsDir.resolve(storedName));
+      } catch (IOException e) {
+        throw new UncheckedIOException("No se pudo borrar la imagen de la tarea", e);
+      }
     }
   }
 

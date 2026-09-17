@@ -76,7 +76,7 @@ public class TaskService implements CreateTaskUseCase, DeleteTaskUseCase, GetTas
 		String previousImage = task.imagePath();
 		String imagePath = fileStoragePort.store(fileName, content);
 		task.attachImage(imagePath);
-		Task saved = taskRepositoryPort.save(task);
+		Task saved = taskRepositoryPort.save(task.attachImage(imagePath));
 		fileStoragePort.delete(previousImage);
 		return saved;
 	}
