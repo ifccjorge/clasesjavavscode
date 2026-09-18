@@ -39,9 +39,9 @@ public class Producto {
   @Size(min = 4, max = 25, message = "El nombre del producto no puede tener menos de 4 caracteres ni más de 25")
   private String nombre;
 
-  @NotNull(message = "El producto tiene que tener una descripcion")
+  @NotNull(message = "La descripcion tiene que tener una descripcion")
   @NotEmpty(message = "La descripcion del producto no puede estar vacío")
-  @Size(max = 25, message = "El nombre del producto no puede superar los 25 caracteres")
+  @Size(max = 100, message = "La descripcion del producto no puede superar los 100 caracteres")
   private String descripcion;
 
   @Min(value = 0, message = "Las existencias no pueden ser negativas")
