@@ -1,10 +1,10 @@
 package com.ejemplo.services;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,10 +12,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static org.mockito.BDDMockito.given;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.Mockito.when;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.ejemplo.DatosPrueba;
 import com.ejemplo.dao.ProductoDao;
-import com.ejemplo.entities.Presentacion;
 import com.ejemplo.entities.Producto;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,37 +27,15 @@ public class ProductoServiceImpTest {
   @InjectMocks
   private ProductoServiceImp productoServiceImp;
 
-  private Presentacion presentacionPorUndades, presentacionPorDecenas;
   private Producto producto1, producto2;
-  List<Producto> listaProductos = new ArrayList<>();
+  List<Producto> listaProductos;
 
   @BeforeEach
   @SuppressWarnings("unused")
   void setUp() {
-    presentacionPorUndades = Presentacion.builder()
-      .nombre("Unidad")
-      .descripcion("Por unidades")
-      .build();
-    presentacionPorDecenas = Presentacion.builder()
-      .nombre("Decenas")
-      .descripcion("Por decenas")
-      .build();
-    producto1 = Producto.builder()
-      .nombre("Google Pixel 11 Pro")
-      .descripcion("Google Smart Phone")
-      .precio(new BigDecimal(900))
-      .existencias(5)
-      .presentacion(presentacionPorUndades)
-      .build();
-    producto2 = Producto.builder()
-      .nombre("Tornillos fijadores")
-      .descripcion("Tornillos fijadores de pared")
-      .precio(new BigDecimal(2.5))
-      .existencias(50)
-      .presentacion(presentacionPorDecenas)
-      .build();
-    listaProductos.add(producto1);
-    listaProductos.add(producto2);
+    listaProductos = new DatosPrueba().getListaProductos();
+    producto1 = listaProductos.get(0);
+    producto2 = listaProductos.get(1);
   }
 
   @Test
@@ -64,11 +43,34 @@ public class ProductoServiceImpTest {
   void testSave() {
     // given
     given(productoDao.save(producto1)).willReturn(producto1);
+    given(productoDao.save(producto2)).willReturn(producto2);
     // when
-    Producto productoGuardado = productoServiceImp.save(producto1);
+    Producto productoGuardado1 = productoServiceImp.save(producto1);
+    Producto productoGuardado2 = productoServiceImp.save(producto2);
     // then
-    assertThat(productoGuardado).isNotNull();
-    assertThat(productoGuardado.getExistencias()).isEqualTo(5);
+    assertThat(productoGuardado1).isNotNull();
+    assertThat(productoGuardado1.getExistencias()).isEqualTo(5);
+    assertThat(productoGuardado2).isNotNull();
+    assertThat(productoGuardado2.getExistencias()).isEqualTo(50);
   }
 
+  @Test
+  @DisplayName("Test de servicio para recuperar una lista vacía de productos")
+  void testEmptyProductList() {
+    // given
+    given(productoDao.findAll()).willReturn(Collections.emptyList());
+    // when
+    List<Producto> productos = productoServiceImp.findAll();
+    // then
+    assertThat(productos).isEmpty();
+  }
+
+  @Test
+  @DisplayName("Test de servicio para recuperar los dos productos creados")
+  void testFindAll() {
+    // when
+    when(productoServiceImp.findAll()).thenReturn(listaProductos);
+    // then
+    assertEquals(2, productoServiceImp.findAll().size());
+  }
 }
