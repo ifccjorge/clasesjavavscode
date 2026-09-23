@@ -46,7 +46,7 @@ import lombok.RequiredArgsConstructor;
 public class ProductoController {
 
   private final static String ID = "id";
-  private final static String NAME = "name";
+  private final static String NAME = "nombre";
 
   private final ProductoService productoService;
   private final FileUploadUtil fileUploadUtil;
@@ -92,7 +92,7 @@ public class ProductoController {
       if (producto != null) {
         String successMessage = "El product con id " + product_id + " ha sido encontrado";
         responseMap.put("mensaje todo OK", successMessage);
-        responseMap.put("producto encontrado", producto);
+        responseMap.put("producto_encontrado", producto);
         responseEntity = new ResponseEntity<>(responseMap, HttpStatus.OK);
       } else {
         String failureMessage = "No ha sido encotrado el producto con id " + product_id;
@@ -139,7 +139,7 @@ public class ProductoController {
     try {
       Producto productoPersistido = productoService.save(producto);
       responseMap.put("mensaje", "Producto persistido exitosamente");
-      responseMap.put("Producto persistido", productoPersistido);
+      responseMap.put("producto_persistido", productoPersistido);
       responseEntity = new ResponseEntity<>(responseMap, HttpStatus.CREATED);
     } catch (DataAccessException e) {
       responseMap.put("Error grave", "No ha podido ser guardado el producto y la causa más probable es "
