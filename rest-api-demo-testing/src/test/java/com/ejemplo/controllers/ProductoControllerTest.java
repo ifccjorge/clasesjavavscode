@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase.Replace;
@@ -18,8 +19,10 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,6 +32,7 @@ import com.ejemplo.entities.Producto;
 import com.ejemplo.services.ProductoService;
 import com.ejemplo.utilities.FileDownloadUtil;
 import com.ejemplo.utilities.FileUploadUtil;
+import com.ejemplo.utilities.FileUtil;
 
 import tools.jackson.databind.ObjectMapper;
 
@@ -51,9 +55,14 @@ public class ProductoControllerTest {
   @MockitoBean
   ProductoService productoService;
   @MockitoBean
+  @SuppressWarnings("unused")
+  FileDownloadUtil fileDownloadUtil;
+  @MockitoBean
+  @SuppressWarnings("unused")
   FileUploadUtil fileUploadUtil;
   @MockitoBean
-  FileDownloadUtil fileDownloadUtil;
+  @SuppressWarnings("unused")
+  FileUtil fileUtil;
 
   // Datos de prueba
   List<Producto> listaProductos;
@@ -93,10 +102,9 @@ public class ProductoControllerTest {
       "application/json",
       jsonStringProducto.getBytes()
     );
-    ResultActions resultActions;
-      resultActions = this.mockMvc.perform(
-        multipart("/productos").file("file", null).file(bytesArrayProducto)
-      );
+    ResultActions resultActions = this.mockMvc.perform(
+      multipart("/productos").file("file", null).file(bytesArrayProducto)
+    );
     // then
     resultActions.andDo(print())
       .andExpect(status().isCreated())
@@ -115,8 +123,8 @@ public class ProductoControllerTest {
     ResultActions resultActions = mockMvc.perform(get("/productos/{id}", productoId));
     // then
     resultActions.andDo(print())
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.producto_encontrado.nombre()", is(producto1.getNombre())));
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.producto_encontrado.nombre", is(producto1.getNombre())));
   }
 
   @Test
@@ -130,4 +138,75 @@ public class ProductoControllerTest {
     // then
     resultActions.andDo(print()).andExpect(status().isNotFound());
   }
+
+  @Test
+  @DisplayName("Test de controlador para actualizar un producto sin imagen")
+  void testActualizarProductoSinImagen() throws Exception {
+    int productoId = 1;
+    Producto producto1 = listaProductos.get(0);
+    // given
+    given(productoService.findById(productoId)).willReturn(producto1);
+    given(productoService.save(any(Producto.class)))
+      .willAnswer(invocation -> invocation.getArgument(0));
+    // when
+    ResultActions resultActions = mockMvc.perform(
+      put("/productos/sinimagen/{id}", productoId)
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(producto1))
+    );
+    // then
+    resultActions.andDo(print())
+      .andExpect(status().isOk())
+      .andExpect(jsonPath("$.producto_actualizado.nombre", is(producto1.getNombre())))
+      .andExpect(jsonPath("$.producto_actualizado.descripcion", is(producto1.getDescripcion())))
+      .andExpect(jsonPath("$.producto_actualizado.imagen", is(producto1.getProductoImage())));
+  }
+
+  @Test
+  @DisplayName("Test de controlador para persistir un producto con imagen")
+  void testActualizarProductoConImagen() throws Exception {
+    int productoId = 1;
+    Producto producto1 = listaProductos.get(0);
+    // given
+    given(productoService.findById(productoId)).willReturn(producto1);
+    given(productoService.save(any(Producto.class)))
+      .willAnswer(invocation -> invocation.getArgument(0));
+    // when
+    String jsonStringProducto = objectMapper.writeValueAsString(producto1);
+    MockMultipartFile bytesArrayProducto = new MockMultipartFile(
+      "producto",
+      null,
+      "application/json",
+      jsonStringProducto.getBytes());
+    ResultActions resultActions = this.mockMvc.perform(
+      multipart("/productos/{id}", productoId)
+        .with(request -> {
+          request.setMethod("PUT");
+          return request;
+        })
+      .file("file", null)
+      .file(bytesArrayProducto));
+    // then
+    resultActions.andDo(print())
+      .andExpect(status().isCreated())
+      .andExpect(jsonPath("$.producto_actualizado.nombre", is(producto1.getNombre())))
+      .andExpect(jsonPath("$.producto_actualizado.descripcion", is(producto1.getDescripcion())))
+      .andExpect(jsonPath("$.producto_actualizado.imagen", is(producto1.getProductoImage())));
+  }
+
+  @Test
+  @DisplayName("Test de controlador para eliminar un producto")
+  void testDeleteProducto() throws Exception {
+    int productoId = 1;
+    Producto producto1 = listaProductos.get(0);
+    // given
+    given(productoService.findById(productoId)).willReturn(producto1);
+    willDoNothing().given(productoService).delete(producto1);
+    // when
+    ResultActions resultActions = mockMvc.perform(
+      delete("/productos/{id}", productoId).accept(MediaType.APPLICATION_JSON));
+    // then
+    resultActions.andExpect(status().isOk()).andDo(print());
+  }
+
 }

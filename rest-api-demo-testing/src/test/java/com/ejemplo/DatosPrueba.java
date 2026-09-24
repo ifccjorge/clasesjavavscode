@@ -26,6 +26,7 @@ public class DatosPrueba {
       .precio(new BigDecimal(900))
       .existencias(5)
       .presentacion(presentacionPorUndades)
+      .productoImage("imagen1.jpg")
       .build();
     Producto producto2 = Producto.builder()
       .nombre("Tornillos fijadores")
@@ -33,6 +34,7 @@ public class DatosPrueba {
       .precio(new BigDecimal(2.5))
       .existencias(50)
       .presentacion(presentacionPorDecenas)
+      .productoImage("imagen2.jpg")
       .build();
     this.listaProductos.add(producto1);
     this.listaProductos.add(producto2);

@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -169,7 +170,48 @@ public class ProductoController {
         .body(resource);
   }
 
-  // Actualizar un empleado: http://localhost:8080/productos/1
+  // Actualizar un producto sin imagen: http://localhost:8080/productos/sinimagen/1
+  @PutMapping("/sinimagen/{id}")
+  @Transactional
+  public ResponseEntity<Map<String, Object>> updateProducto(@Valid @RequestBody Producto 
+  product, BindingResult results, @PathVariable Integer id) {
+    ResponseEntity<Map<String, Object>> responseEntity;
+    Map<String, Object> responseAsMap = new HashMap<>();
+    // Comprobar si el producto recibido en el cuerpo de la peticion tiene errores
+    if (results.hasErrors()) {
+      // Recuperar todos los errores que tiene el producto
+      List<ObjectError> objectErrors = results.getAllErrors();
+      // Hay que recorrer la lista de ObjectError para recuperar los mensajes de error
+      // por defecto que le voy a mostrar al cliente que ha hecho la peticion,
+      // es decir, que ha enviado el producto mal formado
+      // Los mensajes de error tienen que ser almacenados en una lista donde cada
+      // elemento de la lista
+      // sea un String
+      List<String> mensajesError = new ArrayList<>();
+      objectErrors.stream().forEach(objectError -> mensajesError.add(objectError.getDefaultMessage()));
+      responseAsMap.put("errores", mensajesError);
+      responseAsMap.put("producto", product);
+      responseEntity = new ResponseEntity<>(responseAsMap, HttpStatus.BAD_REQUEST);
+      return responseEntity;
+    }
+    // Si no hay errores vamos a actualizar el producto recibido y devolver informacion al respecto como se requiere para una API REST
+    try {
+        product.setId(id);
+        Producto productoModificado = productoService.save(product);
+        String mensaje = "El producto ha sido modificado exitosamente";
+        responseAsMap.put("mensaje", mensaje);
+        responseAsMap.put("producto_actualizado", productoModificado);
+        responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.OK);
+    } catch (DataAccessException e) {
+        String errorMessage = "El producto no se pudo modificar y la causa mas probable es: "
+        + e.getMostSpecificCause().getMessage();
+        responseAsMap.put("error", errorMessage);
+        responseEntity = new ResponseEntity<>(responseAsMap, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    return responseEntity;
+  }
+
+  // Actualizar un producto: http://localhost:8080/productos/1
   @PutMapping(value = "/{id}", consumes = "multipart/form-data")
   @Transactional
   public ResponseEntity<Map<String, Object>> updateProduct(
@@ -211,7 +253,7 @@ public class ProductoController {
       producto.setId(id);
       Producto productoPersistido = productoService.save(producto);
       responseMap.put("mensaje", "Producto actualizado exitosamente");
-      responseMap.put("Producto actualizado", productoPersistido);
+      responseMap.put("producto_actualizado", productoPersistido);
       responseEntity = new ResponseEntity<>(responseMap, HttpStatus.CREATED);
     } catch (DataAccessException e) {
       responseMap.put("Error grave", "No ha podido ser actualizado el producto y la causa más probable es "

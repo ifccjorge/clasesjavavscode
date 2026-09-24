@@ -2,6 +2,8 @@ package com.ejemplo.entities;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -54,5 +56,6 @@ public class Producto {
   @ManyToOne(fetch = FetchType.LAZY)
   private Presentacion presentacion;
 
+  @JsonProperty("imagen")
   private String productoImage;
 }
