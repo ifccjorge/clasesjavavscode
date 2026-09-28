@@ -10,14 +10,22 @@ import com.ejemplo.entities.Presentacion;
 import com.ejemplo.entities.Producto;
 import com.ejemplo.services.PresentacionService;
 import com.ejemplo.services.ProductoService;
+import com.ejemplo.spring_security_jwt.model.ERole;
+import com.ejemplo.spring_security_jwt.model.Role;
+import com.ejemplo.spring_security_jwt.repository.RoleRepository;
 
 @Configuration
 public class CreateSampleData {
+  CreateSampleData(RoleRepository roleRepository) {
+  }
+
   @Bean
-  public CommandLineRunner sampleData(ProductoService productoService, PresentacionService presentacionService) {
+  CommandLineRunner sampleData(ProductoService productoService, PresentacionService presentacionService, RoleRepository roleRepository) {
     return args -> {
+      // Presentaciones
       presentacionService.save(Presentacion.builder().nombre("unidad").descripcion("por unidades").build());
       presentacionService.save(Presentacion.builder().nombre("decena").descripcion("por decenas").build());
+      // Productos
       productoService.save(
         Producto.builder()
           .nombre("rezma de papel")
@@ -63,7 +71,6 @@ public class CreateSampleData {
           .presentacion(presentacionService.findById(1))
           .build()
       );
-
       productoService.save(
         Producto.builder()
           .nombre("altavoces bluetooth")
@@ -118,6 +125,9 @@ public class CreateSampleData {
           .presentacion(presentacionService.findById(1))
           .build()
       );
+      // Roles
+      roleRepository.save(Role.builder().name(ERole.ROLE_ADMIN).build());
+      roleRepository.save(Role.builder().name(ERole.ROLE_USER).build());
     };
   }
 }
