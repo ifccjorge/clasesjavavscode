@@ -1,6 +1,7 @@
 package com.ejemplo;
 
 import java.math.BigDecimal;
+import java.util.Set;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -12,15 +13,19 @@ import com.ejemplo.services.PresentacionService;
 import com.ejemplo.services.ProductoService;
 import com.ejemplo.spring_security_jwt.model.ERole;
 import com.ejemplo.spring_security_jwt.model.Role;
+import com.ejemplo.spring_security_jwt.model.User;
 import com.ejemplo.spring_security_jwt.repository.RoleRepository;
+import com.ejemplo.spring_security_jwt.repository.UserRepository;
 
 @Configuration
 public class CreateSampleData {
+  @SuppressWarnings("unused")
   CreateSampleData(RoleRepository roleRepository) {
   }
 
   @Bean
-  CommandLineRunner sampleData(ProductoService productoService, PresentacionService presentacionService, RoleRepository roleRepository) {
+  @SuppressWarnings("unused")
+  CommandLineRunner sampleData(ProductoService productoService, PresentacionService presentacionService, RoleRepository roleRepository, UserRepository userRepository) {
     return args -> {
       // Presentaciones
       presentacionService.save(Presentacion.builder().nombre("unidad").descripcion("por unidades").build());
@@ -126,8 +131,35 @@ public class CreateSampleData {
           .build()
       );
       // Roles
-      roleRepository.save(Role.builder().name(ERole.ROLE_ADMIN).build());
-      roleRepository.save(Role.builder().name(ERole.ROLE_USER).build());
+      Role rolAdmin = Role.builder().name(ERole.ROLE_ADMIN).build();
+      Role rolUser = Role.builder().name(ERole.ROLE_USER).build();
+      roleRepository.save(rolAdmin);
+      roleRepository.save(rolUser);
+      // Usuarios
+      userRepository.save(
+        User.builder()
+          .username("usuario")
+          .email("usuario@server.net")
+          .password("Temp2026")
+          .roles(Set.of(rolUser))
+          .build()
+      );
+      userRepository.save(
+        User.builder()
+          .username("testuser")
+          .email("testuser@server.net")
+          .password("mypassword")
+          .roles(Set.of(rolUser))
+          .build()
+      );
+      userRepository.save(
+        User.builder()
+          .username("tecnico")
+          .email("tecnico@server.net")
+          .password("Temp2026$")
+          .roles(Set.of(rolAdmin, rolUser))
+          .build()
+      );
     };
   }
 }

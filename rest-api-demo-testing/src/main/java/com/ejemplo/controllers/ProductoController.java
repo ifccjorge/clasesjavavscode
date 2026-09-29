@@ -201,7 +201,7 @@ public class ProductoController {
         String mensaje = "El producto ha sido modificado exitosamente";
         responseAsMap.put("mensaje", mensaje);
         responseAsMap.put("producto_actualizado", productoModificado);
-        responseEntity = new ResponseEntity<Map<String, Object>>(responseAsMap, HttpStatus.OK);
+        responseEntity = new ResponseEntity<>(responseAsMap, HttpStatus.OK);
     } catch (DataAccessException e) {
         String errorMessage = "El producto no se pudo modificar y la causa mas probable es: "
         + e.getMostSpecificCause().getMessage();
