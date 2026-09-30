@@ -6,6 +6,7 @@ import java.util.Set;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.ejemplo.entities.Presentacion;
 import com.ejemplo.entities.Producto;
@@ -19,8 +20,11 @@ import com.ejemplo.spring_security_jwt.repository.UserRepository;
 
 @Configuration
 public class CreateSampleData {
+  private final PasswordEncoder passwordEncoder;
+
   @SuppressWarnings("unused")
-  CreateSampleData(RoleRepository roleRepository) {
+  CreateSampleData(RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+    this.passwordEncoder = passwordEncoder;
   }
 
   @Bean
@@ -140,7 +144,7 @@ public class CreateSampleData {
         User.builder()
           .username("usuario")
           .email("usuario@server.net")
-          .password("Temp2026")
+          .password(passwordEncoder.encode(""))
           .roles(Set.of(rolUser))
           .build()
       );
@@ -148,7 +152,7 @@ public class CreateSampleData {
         User.builder()
           .username("testuser")
           .email("testuser@server.net")
-          .password("mypassword")
+          .password(passwordEncoder.encode("mypassword"))
           .roles(Set.of(rolUser))
           .build()
       );
@@ -156,7 +160,7 @@ public class CreateSampleData {
         User.builder()
           .username("tecnico")
           .email("tecnico@server.net")
-          .password("Temp2026$")
+          .password(passwordEncoder.encode("Temp2026$"))
           .roles(Set.of(rolAdmin, rolUser))
           .build()
       );

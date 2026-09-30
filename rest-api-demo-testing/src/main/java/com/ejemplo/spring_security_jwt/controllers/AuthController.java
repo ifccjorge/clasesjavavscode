@@ -49,29 +49,27 @@ public class AuthController {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AuthController.class);
 
+  // Método para registrar un usuario
+  // http://localhost:8080/api/auth/signup
   @PostMapping("/signup")
   public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest, BindingResult validationResults) {
-
+    // Existen los valores
     if (userRepository.existsByUsername(signupRequest.getUsername())) {
       return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken"));
-    } 
-      
+    }
     if (userRepository.existsByEmail(signupRequest.getEmail())) {
       return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already in use!!!"));
     }
-
     // Crear el usuario, es decir, el User para guardarlo en la tabla de User, con
     // las propiedades del JSON recibido en la peticion (signupRequest)
-
     User user = User.builder()
       .username(signupRequest.getUsername())
       .email(signupRequest.getEmail())
       .password(encoder.encode(signupRequest.getPassword()))
       .build();
-
+    // Gestión de roles
     Set<String> strRoles = signupRequest.getRole();
     Set<Role> roles = new HashSet<>();
-
     if (strRoles == null) {
       Role userRole = roleRepository.findByName(ERole.ROLE_USER)
         .orElseThrow(() -> new RuntimeException("Error: Role not found"));
@@ -80,9 +78,9 @@ public class AuthController {
       strRoles.forEach(role -> {
         switch (role) {
           case "admin" -> {
-              Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN).orElseThrow(() -> new RuntimeException("Error: Role is not found"));
-              roles.add(adminRole);
-            }
+            Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN).orElseThrow(() -> new RuntimeException("Error: Role is not found"));
+            roles.add(adminRole);
+          }
           default -> {
             Role userRole = roleRepository.findByName(ERole.ROLE_USER).orElseThrow(() -> new RuntimeException("Error: Role not found")); 
             roles.add(userRole);
@@ -90,39 +88,38 @@ public class AuthController {
         }
       });
     }
-
     user.setRoles(roles);
     userRepository.save(user);
-
+    // Usuario creado
     return ResponseEntity.ok(new MessageResponse("User registered successfully"));
   }
 
   // Metodo para logearse un usuario que se ha registrado previamente
+  // http://localhost:8080/api/auth/signin
   @PostMapping("/signin")
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, BindingResult result) {
-
     // Validar el JSON recibido en el cuerpo de la peticion.
     Authentication authentication = authenticationManager
       .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+    // Genera token
     SecurityContextHolder.getContext().setAuthentication(authentication);
-
     String jwt = jwtUtils.generateJwtToken(authentication);
-
+    // Datos de usuario y roles
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
     List<String> roles = userDetails.getAuthorities().stream()
       .map(item -> item.getAuthority())
       .collect(Collectors.toList());
-
     // Mostrar por la consola los roles
-    LOGGER.info("Roles del usuario: " + roles);
-
-    return ResponseEntity.ok(new JwtResponse(
-      jwt,
-      userDetails.getId(),
-      userDetails.getUsername(),
-      userDetails.getEmail(),
-      roles));
-
+    LOGGER.info("Roles del usuario " + userDetails.getUsername() + ": " + roles);
+    // Resultado correcto
+    return ResponseEntity.ok(
+      new JwtResponse(
+        jwt,
+        userDetails.getId(),
+        userDetails.getUsername(),
+        userDetails.getEmail(),
+        roles
+      )
+    );
   }
 }
