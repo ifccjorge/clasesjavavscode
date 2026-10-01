@@ -1,5 +1,6 @@
 package com.ejemplo.spring_security_jwt.controllers;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -8,13 +9,16 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,8 +66,9 @@ public class AuthController {
     }
     // Crear el usuario, es decir, el User para guardarlo en la tabla de User, con
     // las propiedades del JSON recibido en la peticion (signupRequest)
+    String usuario = signupRequest.getUsername();
     User user = User.builder()
-      .username(signupRequest.getUsername())
+      .username(usuario)
       .email(signupRequest.getEmail())
       .password(encoder.encode(signupRequest.getPassword()))
       .build();
@@ -91,7 +96,8 @@ public class AuthController {
     user.setRoles(roles);
     userRepository.save(user);
     // Usuario creado
-    return ResponseEntity.ok(new MessageResponse("User registered successfully"));
+    LOGGER.info("Usuario {} creado", usuario);
+    return ResponseEntity.ok(new MessageResponse("User " + usuario + " registered successfully"));
   }
 
   // Metodo para logearse un usuario que se ha registrado previamente
@@ -110,7 +116,7 @@ public class AuthController {
       .map(item -> item.getAuthority())
       .collect(Collectors.toList());
     // Mostrar por la consola los roles
-    LOGGER.info("Roles del usuario " + userDetails.getUsername() + ": " + roles);
+    LOGGER.info("Roles del usuario {}: {}", userDetails.getUsername(), roles);
     // Resultado correcto
     return ResponseEntity.ok(
       new JwtResponse(
@@ -122,4 +128,28 @@ public class AuthController {
       )
     );
   }
+
+  // Todos los usuarios: http://localhost:8080/api/auth/users
+  @GetMapping("/users")
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
+  @Transactional
+  public ResponseEntity<?> registerUser2() {
+    List<User> allUsers = userRepository.findAllUsers();
+    List<JwtResponse> allUsersJwtResponse = new ArrayList<>();
+    allUsers.stream().forEach(
+      user -> allUsersJwtResponse.add(
+        new JwtResponse(
+          null,
+          user.getId(),
+          user.getUsername(),
+          user.getEmail(),
+          user.getRoles().stream().map(r -> r.getName().name()).toList()
+        )
+      )
+    );
+    // Usuario creado
+    LOGGER.info("Usuarios encontrados: {}", allUsers.size());
+    return ResponseEntity.ok(allUsersJwtResponse);
+  }
+
 }

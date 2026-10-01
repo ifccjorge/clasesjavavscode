@@ -16,6 +16,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -56,6 +57,7 @@ public class ProductoController {
 
   // Resultado no paginado: http://localhost:8080/productos/listado
   @GetMapping("/listado")
+  @PreAuthorize("hasRole('ROLE_ADMIN') || hasRole('ROLE_USER')")
   public List<Producto> getProductos() {
     List<Producto> allProductos = productoService.findAll(Sort.by(ID));
     return allProductos;
@@ -63,6 +65,7 @@ public class ProductoController {
 
   // Resultado paginado: http://localhost:8080/productos?page=0&size=3
   @GetMapping
+  @PreAuthorize("hasRole('ROLE_ADMIN') || hasRole('ROLE_USER')")
   public ResponseEntity<Map<String, Object>> getProductos(
     @RequestParam(required = false) Integer page,
     @RequestParam(required = false) Integer size
@@ -83,6 +86,7 @@ public class ProductoController {
 
   // Sólo un producto: http://localhost:8080/productos/1
   @GetMapping("/{id}")
+  @PreAuthorize("hasRole('ROLE_ADMIN') || hasRole('ROLE_USER')")
   public ResponseEntity<Map<String, Object>> findProductById(
      @PathVariable(name = "id", required = true) int product_id
   ) {
@@ -111,6 +115,7 @@ public class ProductoController {
 
   // Sólo un producto (application/json) con imagen (application/octet-stream): http://localhost:8080/productos
   @PostMapping(consumes = "multipart/form-data")
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
   @Transactional
   public ResponseEntity<Map<String, Object>> saveProduct(
     @Valid @RequestPart Producto producto,
@@ -152,6 +157,7 @@ public class ProductoController {
 
   // Descargar imagen: http://localhost:8080/productos/fileDownload/hrUfluSx
   @GetMapping("/fileDownload/{fileCode}")
+  @PreAuthorize("hasRole('ROLE_ADMIN')")
   public ResponseEntity<?> downloadFile(@PathVariable String fileCode) {
     Resource resource;
     try {
@@ -172,6 +178,7 @@ public class ProductoController {
 
   // Actualizar un producto sin imagen: http://localhost:8080/productos/sinimagen/1
   @PutMapping("/sinimagen/{id}")
+  @PreAuthorize("hasRole('ROLE_ADMIN') || hasRole('ROLE_USER')")
   @Transactional
   public ResponseEntity<Map<String, Object>> updateProducto(@Valid @RequestBody Producto 
   product, BindingResult results, @PathVariable Integer id) {
@@ -213,6 +220,7 @@ public class ProductoController {
 
   // Actualizar un producto: http://localhost:8080/productos/1
   @PutMapping(value = "/{id}", consumes = "multipart/form-data")
+  @PreAuthorize("hasRole('ROLE_ADMIN') || hasRole('ROLE_USER')")
   @Transactional
   public ResponseEntity<Map<String, Object>> updateProduct(
       @Valid @RequestPart Producto producto,
@@ -265,6 +273,7 @@ public class ProductoController {
 
   // Eliminación de un producto: http://localhost:8080/productos/1
   @DeleteMapping("/{id}")
+  @PreAuthorize("hasRole('ROLE_ADMIN') || hasRole('ROLE_USER')")
   @Transactional
   public ResponseEntity<Map<String, Object>> deleteProducto(@PathVariable Integer id) {
     ResponseEntity<Map<String, Object>> responseEntity;
