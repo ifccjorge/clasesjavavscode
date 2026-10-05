@@ -63,11 +63,15 @@ public class WebSecurityConfig {
   @Bean
   @SuppressWarnings("unused")
   SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    // https://docs.spring.io/spring-security/reference/servlet/authorization/authorize-http-requests.html
     http.csrf(csrf -> csrf.disable())
       .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizeHandle))
       .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-      .authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**").permitAll()
-      .anyRequest().authenticated());
+      .authorizeHttpRequests(
+        auth -> auth
+        .requestMatchers("/api/auth/**").permitAll()
+        .anyRequest().authenticated()
+      );
     http.authenticationProvider(authenticationProvider());
     http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     return http.build();

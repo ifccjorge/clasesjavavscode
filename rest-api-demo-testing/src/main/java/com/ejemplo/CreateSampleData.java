@@ -144,15 +144,7 @@ public class CreateSampleData {
         User.builder()
           .username("usuario")
           .email("usuario@server.net")
-          .password(passwordEncoder.encode(""))
-          .roles(Set.of(rolUser))
-          .build()
-      );
-      userRepository.save(
-        User.builder()
-          .username("testuser")
-          .email("testuser@server.net")
-          .password(passwordEncoder.encode("mypassword"))
+          .password(passwordEncoder.encode("usuario"))
           .roles(Set.of(rolUser))
           .build()
       );
@@ -161,7 +153,7 @@ public class CreateSampleData {
           .username("tecnico")
           .email("tecnico@server.net")
           .password(passwordEncoder.encode("Temp2026$"))
-          .roles(Set.of(rolAdmin, rolUser))
+          .roles(Set.of(rolAdmin))
           .build()
       );
     };
