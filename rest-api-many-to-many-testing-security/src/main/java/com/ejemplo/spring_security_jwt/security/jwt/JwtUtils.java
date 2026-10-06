@@ -31,16 +31,13 @@ public class JwtUtils {
   public String generateJwtToken(Authentication authenticaion) {
   UserDetailsImpl userPrincipal = (UserDetailsImpl) authenticaion.getPrincipal();
   return Jwts.builder()
-    .subject(userPrincipal.getUsername())
+    // .setSubject(userPrincipal.getUsername())
+    .subject(userPrincipal.getEmail())
     .issuedAt(new Date())
     .expiration(new Date((new Date()).getTime() + jwtExpirationMs))
+    // .signWith(key(), SignatureAlgorithm.HS256)
     .signWith(key())
     .compact();
-  // .setSubject(userPrincipal.getUsername())
-  // .setIssuedAt(new Date())
-  // .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
-  // .signWith(key(), SignatureAlgorithm.HS256)
-  // .compact();
   }
 
   private Key key() {

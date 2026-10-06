@@ -19,10 +19,11 @@ import com.ejemplo.spring_security_jwt.repository.UserRepository;
 
 @Configuration
 public class CreateSampleData {
+
   private final PasswordEncoder passwordEncoder;
 
   @SuppressWarnings("unused")
-  CreateSampleData(
+  public CreateSampleData(
     RoleRepository roleRepository,
     PasswordEncoder passwordEncoder
   ) {
@@ -39,23 +40,41 @@ public class CreateSampleData {
   ) {
     return args -> {
       // Tags
-      tagRepository.save(Tag.builder().nombre("nota").build());
-      tagRepository.save(Tag.builder().nombre("aviso").build());
+      Tag tag1 = Tag.builder().nombre("nota").build();
+      Tag tag2 = Tag.builder().nombre("aviso").build();
+      Tag tag3 = Tag.builder().nombre("recomendación").build();
+      Tag tag4 = Tag.builder().nombre("información").build();
+      tagRepository.save(tag1);
+      tagRepository.save(tag2);
+      tagRepository.save(tag3);
+      tagRepository.save(tag4);
       // Tutoriales
-      tutorialRepository.save(
-        Tutorial.builder()
-          .titulo("Curso de inglés")
-          .descripcion("Curso de inglés de nivel avanzado")
-          .publicado(true)
-          .build()
-      );
-      tutorialRepository.save(
-        Tutorial.builder()
-          .titulo("Curso de francés")
-          .descripcion("Curso de francés de nivel avanzado")
-          .publicado(true)
-          .build()
-      );
+      Tutorial tutorial1 = Tutorial.builder()
+        .titulo("Curso de inglés")
+        .descripcion("Curso de inglés de nivel avanzado")
+        .publicado(true)
+        .build();
+      Tutorial tutorial2 = Tutorial.builder()
+        .titulo("Curso de francés")
+        .descripcion("Curso de francés de nivel avanzado")
+        .publicado(true)
+        .build();
+      tutorialRepository.save(tutorial1);
+      tutorialRepository.save(tutorial2);
+      // Relaciones entre entidades
+      tutorial1.addTag(tag1);
+      tutorial1.addTag(tag2);
+      tutorial1.addTag(tag3);
+      tutorial2.addTag(tag2);
+      tutorial2.addTag(tag3);
+      tutorial2.addTag(tag4);
+      // Relaciones persistidas
+      tagRepository.save(tag1);
+      tagRepository.save(tag2);
+      tagRepository.save(tag3);
+      tagRepository.save(tag4);
+      tutorialRepository.save(tutorial1);
+      tutorialRepository.save(tutorial2);
       // Roles
       Role rolAdmin = Role.builder().name(ERole.ROLE_ADMIN).build();
       Role rolUser = Role.builder().name(ERole.ROLE_USER).build();

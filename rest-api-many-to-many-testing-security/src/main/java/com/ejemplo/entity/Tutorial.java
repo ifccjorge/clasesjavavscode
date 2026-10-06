@@ -54,7 +54,7 @@ public class Tutorial implements Serializable {
   private boolean publicado;
 
   @Builder.Default
-  @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
+  @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   @JoinTable(
     name = "tutorials_tags", 
       joinColumns = {
