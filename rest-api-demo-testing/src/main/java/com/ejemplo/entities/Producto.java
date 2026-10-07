@@ -1,5 +1,6 @@
 package com.ejemplo.entities;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -30,7 +31,7 @@ import lombok.ToString;
 @Setter
 @ToString
 @Builder
-public class Producto {
+public class Producto implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

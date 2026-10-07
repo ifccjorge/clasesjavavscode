@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -31,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.ejemplo.DatosPrueba;
 import com.ejemplo.controller.TutorialController;
 import com.ejemplo.entity.Tutorial;
+import com.ejemplo.exception.ResourceNotFoundException;
 import com.ejemplo.repository.TutorialRepository;
 import tools.jackson.databind.ObjectMapper;
 
@@ -64,57 +66,53 @@ public class TutorialControllerTest {
   }
 
   @Test
-  @DisplayName("Test de controlador para recuperar todos los tutoriales")
+  @DisplayName("Test de controlador sin seguridad para recuperar todos los tutoriales")
   void testFindAll() throws Exception {
     // given
-    given(tutorialRepository.findAll(Sort.by("nombre"))).willReturn(listaTutorials);
+    given(tutorialRepository.findAll()).willReturn(listaTutorials);
     // when
     ResultActions resultActions = mockMvc.perform(
-      get("/tutorials").accept(MediaType.APPLICATION_JSON));
+      get("/api/tutorials").accept(MediaType.APPLICATION_JSON)
+    );
     // then
     resultActions.andExpect(status().isOk())
       .andDo(print())
-      .andExpect(jsonPath("$.tutorials.size()", is(this.listaTutorials.size())));
+      .andExpect(jsonPath("$.size()", is(this.listaTutorials.size())));
   }
 
   @Test
-  @DisplayName("Test de controlador para persistir un tutorial")
+  @DisplayName("Test de controlador sin seguridad para persistir un tutorial")
   void testSaveTutorial() throws Exception {
     // given
     Tutorial tutorial1 = this.listaTutorials.get(0);
     given(tutorialRepository.save(any(Tutorial.class)))
       .willAnswer(invocation -> invocation.getArgument(0));
     // when
-    String jsonStringTutorial = objectMapper.writeValueAsString(tutorial1);
-    MockMultipartFile bytesArrayTutorial = new MockMultipartFile(
-      "producto",
-      null,
-      "application/json",
-      jsonStringTutorial.getBytes()
-    );
     ResultActions resultActions = this.mockMvc.perform(
-      multipart("/tutorials").file("file", null).file(bytesArrayTutorial)
+      post("/api/tutorials")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(tutorial1))
     );
     // then
     resultActions.andDo(print())
       .andExpect(status().isCreated())
-      .andExpect(jsonPath("$.producto_persistido.titulo", is(tutorial1.getTitulo())))
-      .andExpect(jsonPath("$.producto_persistido.descripcion", is(tutorial1.getDescripcion())));
+      .andExpect(jsonPath("$.title", is(tutorial1.getTitulo())))
+      .andExpect(jsonPath("$.description", is(tutorial1.getDescripcion())));
   }
 
   @Test
-  @DisplayName("Test de controlador para recuperar un tutorial por su id")
+  @DisplayName("Test de controlador sin seguridad para recuperar un tutorial por su id")
   void testRecuperarTutorialPorId() throws Exception {
     long tutorialId = 1;
     Tutorial tutorial1 = listaTutorials.get(0);
     // given
-    given(tutorialRepository.findById(tutorialId).orElse(null)).willReturn(tutorial1);
+    given(tutorialRepository.findById(tutorialId).orElseThrow(() -> new ResourceNotFoundException("Not found Tutorial with id = " + tutorialId))).willReturn(tutorial1);
     // when
-    ResultActions resultActions = mockMvc.perform(get("/tutorials/{id}", tutorialId));
+    ResultActions resultActions = mockMvc.perform(get("/api/tutorials/{id}", tutorialId));
     // then
     resultActions.andDo(print())
       .andExpect(status().isOk())
-      .andExpect(jsonPath("$.producto_encontrado.titulo", is(tutorial1.getTitulo())));
+      .andExpect(jsonPath("$.title", is(tutorial1.getTitulo())));
   }
 
   @Test

@@ -12,6 +12,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.hateoas.Link;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -87,25 +91,34 @@ public class ProductoController {
   // Sólo un producto: http://localhost:8080/productos/1
   @GetMapping("/{id}")
   @PreAuthorize("hasRole('ROLE_ADMIN') || hasRole('ROLE_USER')")
-  public ResponseEntity<Map<String, Object>> findProductById(
-     @PathVariable(name = "id", required = true) int product_id
+  public ResponseEntity<Map<String, Object>> findProductosById(
+     @PathVariable(name = "id", required = true) int producto_id
   ) {
     Map<String, Object> responseMap = new HashMap<>();
     ResponseEntity<Map<String, Object>> responseEntity;
     try {
-      Producto producto = productoService.findById(product_id);
+      Producto producto = productoService.findById(producto_id);
+      // Ejemplo de enlaces con Spring HATEOAS
+      Link selfLink = linkTo(
+        methodOn(ProductoController.class).findProductosById(producto_id)
+      ).withSelfRel();
+      Link primerosProductosLink = linkTo(
+        methodOn(ProductoController.class).getProductos(0, 3)
+      ).withRel("primeros-3-productos");
       if (producto != null) {
-        String successMessage = "El product con id " + product_id + " ha sido encontrado";
+        String successMessage = "El producto con id " + producto_id + " ha sido encontrado";
         responseMap.put("mensaje todo OK", successMessage);
         responseMap.put("producto_encontrado", producto);
+        responseMap.put("enlace propio", selfLink);
+        responseMap.put("enlace primeros 3 productos", primerosProductosLink);
         responseEntity = new ResponseEntity<>(responseMap, HttpStatus.OK);
       } else {
-        String failureMessage = "No ha sido encotrado el producto con id " + product_id;
+        String failureMessage = "No ha sido encotrado el producto con id " + producto_id;
         responseMap.put("Error", failureMessage);
         responseEntity = new ResponseEntity<>(responseMap, HttpStatus.NOT_FOUND);
       }
     } catch (DataAccessException e) {
-      String failureError = "Error al buscar el producto id " + product_id + " y la causa más probable es "
+      String failureError = "Error al buscar el producto id " + producto_id + " y la causa más probable es "
           + e.getMostSpecificCause().getMessage();
       responseMap.put("Error grave", failureError);
       responseEntity = new ResponseEntity<>(responseMap, HttpStatus.INTERNAL_SERVER_ERROR);

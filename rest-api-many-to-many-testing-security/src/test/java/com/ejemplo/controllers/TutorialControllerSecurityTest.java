@@ -86,10 +86,10 @@ public class TutorialControllerSecurityTest {
   }
 
   @Test
-  @DisplayName("Test de controlador para recuperar todos los tutoriales")
+  @DisplayName("Test de controlador con seguridad para recuperar todos los tutoriales")
   void testFindAllSecurity() throws Exception {
     // given
-    given(tutorialRepository.findAll(Sort.by("nombre"))).willReturn(listaTutorials);
+    given(tutorialRepository.findAll()).willReturn(listaTutorials);
     // when
     ResultActions resultActions = mockMvc.perform(
       get("/tutorials")
@@ -99,7 +99,7 @@ public class TutorialControllerSecurityTest {
     // then
     resultActions.andExpect(status().isOk())
       .andDo(print())
-      .andExpect(jsonPath("$.tutorials.size()", is(this.listaTutorials.size())));
+      .andExpect(jsonPath("$.size()", is(this.listaTutorials.size())));
   }
   
   @Test
@@ -126,7 +126,7 @@ public class TutorialControllerSecurityTest {
     // then
     resultActions.andDo(print())
       .andExpect(status().isCreated())
-      .andExpect(jsonPath("$.producto_persistido.titulo", is(tutorial1.getTitulo)))
+      .andExpect(jsonPath("$.producto_persistido.titulo", is(tutorial1.getTitulo())))
       .andExpect(jsonPath("$.producto_persistido.descripcion", is(tutorial1.getDescripcion())));
   }
 
