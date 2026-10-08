@@ -57,7 +57,7 @@ public class CreateSampleData {
       Tutorial tutorial2 = Tutorial.builder()
         .titulo("Curso de francés")
         .descripcion("Curso de francés de nivel avanzado")
-        .publicado(true)
+        .publicado(false)
         .build();
       tutorialRepository.save(tutorial1);
       tutorialRepository.save(tutorial2);

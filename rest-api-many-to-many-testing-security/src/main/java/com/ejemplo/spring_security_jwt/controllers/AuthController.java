@@ -81,15 +81,12 @@ public class AuthController {
     } else {
       strRoles.forEach(
         role -> {
-          switch (role) {
-            case "admin" -> {
+          if (role.equals("admin")) {
               Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN).orElseThrow(() -> new RuntimeException("Error: Role is not found"));
               roles.add(adminRole);
-            }
-            default -> {
+          } else {
               Role userRole = roleRepository.findByName(ERole.ROLE_USER).orElseThrow(() -> new RuntimeException("Error: Role not found"));
               roles.add(userRole);
-            }
           }
         }
       );
@@ -97,7 +94,7 @@ public class AuthController {
     user.setRoles(roles);
     userRepository.save(user);
     // Usuario creado
-    LOGGER.info("Usuario {} creado", usuario);
+    LOGGER.info("Usuario {} creado con roles {}", usuario, roles);
     return ResponseEntity.ok(new MessageResponse("User " + usuario + " registered successfully"));
   }
 

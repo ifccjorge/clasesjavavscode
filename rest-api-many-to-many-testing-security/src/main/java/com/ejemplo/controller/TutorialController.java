@@ -55,26 +55,26 @@ public class TutorialController {
   @PostMapping("/tutorials")
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   public ResponseEntity<Tutorial> createTutorial(@RequestBody Tutorial tutorial) {
-    Tutorial _tutorial = tutorialRepository.save(
+    Tutorial tutorial0 = tutorialRepository.save(
       Tutorial.builder()
         .titulo(tutorial.getTitulo())
         .descripcion(tutorial.getDescripcion())
         .publicado(tutorial.isPublicado())
         .build()
     );
-    return new ResponseEntity<>(_tutorial, HttpStatus.CREATED);
+    return new ResponseEntity<>(tutorial0, HttpStatus.CREATED);
   }
 
   // http://localhost:8080/api/tutorials/1
   @PutMapping("/tutorials/{id}")
   @PreAuthorize("hasRole('ROLE_ADMIN')")
   public ResponseEntity<Tutorial> updateTutorial(@PathVariable("id") long id, @RequestBody Tutorial tutorial) {
-    Tutorial _tutorial = tutorialRepository.findById(id)
+    Tutorial tutorial0 = tutorialRepository.findById(id)
         .orElseThrow(() -> new ResourceNotFoundException("Not found Tutorial with id = " + id));
-    _tutorial.setTitulo(tutorial.getTitulo());
-    _tutorial.setDescripcion(tutorial.getDescripcion());
-    _tutorial.setPublicado(tutorial.isPublicado());
-    return new ResponseEntity<>(tutorialRepository.save(_tutorial), HttpStatus.OK);
+    tutorial0.setTitulo(tutorial.getTitulo());
+    tutorial0.setDescripcion(tutorial.getDescripcion());
+    tutorial0.setPublicado(tutorial.isPublicado());
+    return new ResponseEntity<>(tutorialRepository.save(tutorial0), HttpStatus.OK);
   }
 
   // http://localhost:8080/api/tutorials/1

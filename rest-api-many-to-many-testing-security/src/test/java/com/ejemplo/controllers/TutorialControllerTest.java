@@ -1,6 +1,7 @@
 package com.ejemplo.controllers;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.is;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,15 +15,12 @@ import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabas
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -32,8 +30,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.ejemplo.DatosPrueba;
 import com.ejemplo.controller.TutorialController;
 import com.ejemplo.entity.Tutorial;
-import com.ejemplo.exception.ResourceNotFoundException;
 import com.ejemplo.repository.TutorialRepository;
+
 import tools.jackson.databind.ObjectMapper;
 
 // Test integración a la capa de controladores que conlleva peticiones HTTP
@@ -69,7 +67,7 @@ public class TutorialControllerTest {
   @DisplayName("Test de controlador sin seguridad para recuperar todos los tutoriales")
   void testFindAll() throws Exception {
     // given
-    given(tutorialRepository.findAll()).willReturn(listaTutorials);
+    given(tutorialRepository.findAll()).willReturn(this.listaTutorials);
     // when
     ResultActions resultActions = mockMvc.perform(
       get("/api/tutorials").accept(MediaType.APPLICATION_JSON)
@@ -104,9 +102,9 @@ public class TutorialControllerTest {
   @DisplayName("Test de controlador sin seguridad para recuperar un tutorial por su id")
   void testRecuperarTutorialPorId() throws Exception {
     long tutorialId = 1;
-    Tutorial tutorial1 = listaTutorials.get(0);
+    Tutorial tutorial1 = this.listaTutorials.get(0);
     // given
-    given(tutorialRepository.findById(tutorialId).orElseThrow(() -> new ResourceNotFoundException("Not found Tutorial with id = " + tutorialId))).willReturn(tutorial1);
+    given(tutorialRepository.findById(tutorialId)).willReturn(Optional.of(tutorial1));
     // when
     ResultActions resultActions = mockMvc.perform(get("/api/tutorials/{id}", tutorialId));
     // then
@@ -116,53 +114,70 @@ public class TutorialControllerTest {
   }
 
   @Test
-  @DisplayName("Test de controlador para un tutorial no encontrado")
+  @DisplayName("Test de controlador sin seguridad para un tutorial no encontrado")
   void testTutorialNoEncontrado() throws Exception {
     long tutorialId = 1;
     // given
-    given(tutorialRepository.findById(tutorialId)).willReturn(null);
+    given(tutorialRepository.findById(tutorialId)).willReturn(Optional.empty());
     // when
-    ResultActions resultActions = mockMvc.perform(get("/tutorials/{id}", tutorialId));
+    ResultActions resultActions = mockMvc.perform(get("/api/tutorials/{id}", tutorialId));
     // then
     resultActions.andDo(print()).andExpect(status().isNotFound());
   }
 
   @Test
-  @DisplayName("Test de controlador para actualizar un tutorial")
+  @DisplayName("Test de controlador sin seguridad para actualizar un tutorial")
   void testActualizarTutorial() throws Exception {
     long tutorialId = 1;
-    Tutorial tutorial1 = listaTutorials.get(0);
+    Tutorial tutorial1 = this.listaTutorials.get(0);
     // given
-    given(tutorialRepository.findById(tutorialId).orElse(null)).willReturn(tutorial1);
+    given(tutorialRepository.findById(tutorialId)).willReturn(Optional.of(tutorial1));
     given(tutorialRepository.save(any(Tutorial.class)))
       .willAnswer(invocation -> invocation.getArgument(0));
     // when
     ResultActions resultActions = mockMvc.perform(
-      put("/tutorials/{id}", tutorialId)
+      put("/api/tutorials/{id}", tutorialId)
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(tutorial1))
     );
     // then
     resultActions.andDo(print())
       .andExpect(status().isOk())
-      .andExpect(jsonPath("$.producto_actualizado.titulo", is(tutorial1.getTitulo())))
-        .andExpect(jsonPath("$.producto_actualizado.descripcion", is(tutorial1.getDescripcion())));
+      .andExpect(jsonPath("$.title", is(tutorial1.getTitulo())))
+      .andExpect(jsonPath("$.description", is(tutorial1.getDescripcion())));
   }
 
   @Test
-  @DisplayName("Test de controlador para eliminar un tutorial")
-  void testDeleteProducto() throws Exception {
-    long productoId = 1;
-    Tutorial tutorial1 = listaTutorials.get(0);
+  @DisplayName("Test de controlador sin seguridad para eliminar un tutorial")
+  void testDeleteTutorial() throws Exception {
+    long tutorialId = 1;
+    Tutorial tutorial1 = this.listaTutorials.get(0);
     // given
-    given(tutorialRepository.findById(productoId).orElse(null)).willReturn(tutorial1);
+    given(tutorialRepository.findById(tutorialId)).willReturn(Optional.of(tutorial1));
     willDoNothing().given(tutorialRepository).delete(tutorial1);
     // when
     ResultActions resultActions = mockMvc.perform(
-      delete("/tutorials/{id}", productoId).accept(MediaType.APPLICATION_JSON)
+      delete("/api/tutorials/{id}", tutorialId).accept(MediaType.APPLICATION_JSON)
     );
     // then
-    resultActions.andExpect(status().isOk()).andDo(print());
+    resultActions.andExpect(status().isNoContent()).andDo(print());
+  }
+
+  @Test
+  @DisplayName("Test de controlador sin seguridad para recuperar todos los tutoriales publicados")
+  void testFindPublished() throws Exception {
+    // given
+    List<Tutorial> listaTutorialsPublished = this.listaTutorials.stream().filter(t -> t.isPublicado()).toList();
+    given(tutorialRepository.findByPublicado(true)).willReturn(listaTutorialsPublished);
+    // when
+    ResultActions resultActions = mockMvc.perform(
+      get("/api/tutorials/published").accept(MediaType.APPLICATION_JSON)
+    );
+    // then
+    resultActions.andExpect(status().isOk())
+      .andDo(print())
+      .andExpect(jsonPath("$.size()", is(listaTutorialsPublished.size()))
+    );
   }
 
 }

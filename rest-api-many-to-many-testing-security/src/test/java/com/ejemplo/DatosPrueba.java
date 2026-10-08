@@ -23,7 +23,7 @@ public class DatosPrueba {
       Tutorial.builder()
         .titulo("Curso de francés")
         .descripcion("Curso de francés de nivel avanzado")
-        .publicado(true)
+        .publicado(false)
         .build()
     );
     this.listaTags.add(Tag.builder().nombre("nota").build());

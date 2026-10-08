@@ -1,6 +1,7 @@
 package com.ejemplo.controllers;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.CoreMatchers.is;
 import org.json.JSONObject;
@@ -15,16 +16,13 @@ import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabas
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -89,10 +87,10 @@ public class TutorialControllerSecurityTest {
   @DisplayName("Test de controlador con seguridad para recuperar todos los tutoriales")
   void testFindAllSecurity() throws Exception {
     // given
-    given(tutorialRepository.findAll()).willReturn(listaTutorials);
+    given(tutorialRepository.findAll()).willReturn(this.listaTutorials);
     // when
     ResultActions resultActions = mockMvc.perform(
-      get("/tutorials")
+      get("/api/tutorials")
         .accept(MediaType.APPLICATION_JSON)
         .header("Authorization", this.token)
     );
@@ -101,78 +99,71 @@ public class TutorialControllerSecurityTest {
       .andDo(print())
       .andExpect(jsonPath("$.size()", is(this.listaTutorials.size())));
   }
-  
+
   @Test
-  @DisplayName("Test de controlador para persistir un tutorial")
+  @DisplayName("Test de controlador con seguridad para persistir un tutorial")
   void testSaveTutorialSecurity() throws Exception {
     // given
     Tutorial tutorial1 = this.listaTutorials.get(0);
     given(tutorialRepository.save(any(Tutorial.class)))
-        .willAnswer(invocation -> invocation.getArgument(0));
+      .willAnswer(invocation -> invocation.getArgument(0));
     // when
-    String jsonStringTutorial = objectMapper.writeValueAsString(tutorial1);
-    MockMultipartFile bytesArrayProducto = new MockMultipartFile(
-      "producto",
-      null,
-      "application/json",
-      jsonStringTutorial.getBytes()
-    );
     ResultActions resultActions = this.mockMvc.perform(
-      multipart("/tutorials")
-        .file("file", null)
-        .file(bytesArrayProducto)
+      post("/api/tutorials")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(tutorial1))
         .header("Authorization", this.token)
     );
     // then
     resultActions.andDo(print())
       .andExpect(status().isCreated())
-      .andExpect(jsonPath("$.producto_persistido.titulo", is(tutorial1.getTitulo())))
-      .andExpect(jsonPath("$.producto_persistido.descripcion", is(tutorial1.getDescripcion())));
+      .andExpect(jsonPath("$.title", is(tutorial1.getTitulo())))
+      .andExpect(jsonPath("$.description", is(tutorial1.getDescripcion())));
   }
 
   @Test
-  @DisplayName("Test de controlador para recuperar un tutorial por su id")
+  @DisplayName("Test de controlador con seguridad para recuperar un tutorial por su id")
   void testRecuperarTutorialPorIdSecurity() throws Exception {
     long tutorialId = 1;
-    Tutorial tutorial1 = listaTutorials.get(0);
+    Tutorial tutorial1 = this.listaTutorials.get(0);
     // given
-    given(tutorialRepository.findById(tutorialId).orElse(null)).willReturn(tutorial1);
+    given(tutorialRepository.findById(tutorialId)).willReturn(Optional.of(tutorial1));
     // when
     ResultActions resultActions = mockMvc.perform(
-      get("/tutorials/{id}", tutorialId).header("Authorization", this.token)
+      get("/api/tutorials/{id}", tutorialId).header("Authorization", this.token)
     );
     // then
     resultActions.andDo(print())
       .andExpect(status().isOk())
-      .andExpect(jsonPath("$.producto_encontrado.titulo", is(tutorial1.getTitulo())));
+      .andExpect(jsonPath("$.title", is(tutorial1.getTitulo())));
   }
 
   @Test
-  @DisplayName("Test de controlador para un tutorial no encontrado")
+  @DisplayName("Test de controlador con seguridad para un tutorial no encontrado")
   void testTutorialNoEncontradoSecurity() throws Exception {
     long tutorialId = 1;
     // given
-    given(tutorialRepository.findById(tutorialId)).willReturn(null);
+    given(tutorialRepository.findById(tutorialId)).willReturn(Optional.empty());
     // when
-    ResultActions resultActions = mockMvc
-        .perform(get("/tutorials/{id}", tutorialId).header("Authorization", this.token)
+    ResultActions resultActions = mockMvc.perform(
+      get("/api/tutorials/{id}", tutorialId).header("Authorization", this.token)
     );
     // then
     resultActions.andDo(print()).andExpect(status().isNotFound());
   }
 
   @Test
-  @DisplayName("Test de controlador para actualizar un tutorial")
+  @DisplayName("Test de controlador con seguridad para actualizar un tutorial")
   void testActualizarTutorialSecurity() throws Exception {
     long tutorialId = 1;
-    Tutorial tutorial1 = listaTutorials.get(0);
+    Tutorial tutorial1 = this.listaTutorials.get(0);
     // given
-    given(tutorialRepository.findById(tutorialId).orElse(null)).willReturn(tutorial1);
+    given(tutorialRepository.findById(tutorialId)).willReturn(Optional.of(tutorial1));
     given(tutorialRepository.save(any(Tutorial.class)))
       .willAnswer(invocation -> invocation.getArgument(0));
     // when
     ResultActions resultActions = mockMvc.perform(
-      put("/tutorials/{id}", tutorialId)
+      put("/api/tutorials/{id}", tutorialId)
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(tutorial1))
         .header("Authorization", this.token)
@@ -180,26 +171,44 @@ public class TutorialControllerSecurityTest {
     // then
     resultActions.andDo(print())
       .andExpect(status().isOk())
-      .andExpect(jsonPath("$.producto_actualizado.titulo", is(tutorial1.getTitulo())))
-      .andExpect(jsonPath("$.producto_actualizado.descripcion", is(tutorial1.getDescripcion())));
+      .andExpect(jsonPath("$.title", is(tutorial1.getTitulo())))
+      .andExpect(jsonPath("$.description", is(tutorial1.getDescripcion())));
   }
 
   @Test
-  @DisplayName("Test de controlador para eliminar un tutorial")
-  void testDeleteProductoSecurity() throws Exception {
-    long productoId = 1;
-    Tutorial tutorial1 = listaTutorials.get(0);
+  @DisplayName("Test de controlador con seguridad para eliminar un tutorial")
+  void testDeleteTutorialSecurity() throws Exception {
+    long tutorialId = 1;
+    Tutorial tutorial1 = this.listaTutorials.get(0);
     // given
-    given(tutorialRepository.findById(productoId).orElse(null)).willReturn(tutorial1);
+    given(tutorialRepository.findById(tutorialId)).willReturn(Optional.of(tutorial1));
     willDoNothing().given(tutorialRepository).delete(tutorial1);
     // when
     ResultActions resultActions = mockMvc.perform(
-      delete("/tutorials/{id}", productoId)
+      delete("/api/tutorials/{id}", tutorialId)
         .accept(MediaType.APPLICATION_JSON)
         .header("Authorization", this.token)
     );
     // then
-    resultActions.andExpect(status().isOk()).andDo(print());
+    resultActions.andExpect(status().isNoContent()).andDo(print());
   }
-
+  @Test
+  @DisplayName("Test de controlador con seguridad para recuperar todos los tutoriales publicados")
+  void testFindPublishedSecurity() throws Exception {
+    // given
+    List<Tutorial> listaTutorialsPublished = this.listaTutorials.stream().filter(t -> t.isPublicado()).toList();
+    given(tutorialRepository.findByPublicado(true)).willReturn(listaTutorialsPublished);
+    // when
+    ResultActions resultActions = mockMvc.perform(
+      get("/api/tutorials/published")
+        .accept(MediaType.APPLICATION_JSON)
+        .header("Authorization", this.token)
+    );
+    // then
+    resultActions.andExpect(status().isOk())
+      .andDo(print())
+      .andExpect(jsonPath("$.size()", is(listaTutorialsPublished.size()))
+    );
+  }
+  
 }
