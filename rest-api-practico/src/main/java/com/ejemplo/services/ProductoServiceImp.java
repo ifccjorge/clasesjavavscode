@@ -1,0 +1,58 @@
+package com.ejemplo.services;
+
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
+import com.ejemplo.dao.ProductoDao;
+import com.ejemplo.entities.Presentacion;
+import com.ejemplo.entities.Producto;
+
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+public class ProductoServiceImp implements ProductoService {
+
+    private final ProductoDao productoDao;
+    
+    @Override
+    public Page<Producto> findAll(Pageable pageable) {
+      return productoDao.findAll(pageable);
+    }
+
+    @Override
+    public List<Producto> findAll(Sort sort) {
+      return productoDao.findAll(sort);
+    }
+
+    @Override
+    public Producto findById(int id) {
+      return productoDao.findById(id);
+    }
+
+    @Override
+    public Producto save(Producto producto) {
+      return productoDao.save(producto);
+    }
+
+    @Override
+    public void delete(Producto producto) {
+      productoDao.delete(producto);
+    }
+
+    @Override
+    public List<Producto> findAll() {
+      return productoDao.findAll();
+    }
+
+    // Examen práctico 4
+    @Override
+    public List<Producto> findByPresentacion(Presentacion presentacion) {
+      return productoDao.findByPresentacion(presentacion);
+    }
+
+}
